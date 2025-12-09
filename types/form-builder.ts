@@ -10,3 +10,14 @@ export interface Field {
   attrs?: ObjectGeneric;
   validation?: any;
 }
+
+export interface FieldWithConditions extends Field {
+  hidden?: (values: ObjectGeneric) => boolean;
+  disabled?: (values: ObjectGeneric) => boolean;
+  options?: (values: ObjectGeneric) => any[];
+  defaultValue?: (values: ObjectGeneric) => any;
+  dependsOn?: string[]; // Track which fields this depends on
+  clearOnChange?: boolean; // Whether to clear this field when dependencies change (default: true)
+  colSpan?: number; // Number of columns to span (1-12)
+  row?: number; // Group fields by row number
+}

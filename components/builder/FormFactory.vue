@@ -7,31 +7,12 @@
         {{ field.label }}
       </label>
 
-        <template v-if="field.component === 'UCalendar'">
-            <UPopover>
-                <!-- Button trigger -->
-                <UButton variant="outline" class="w-full justify-between">
-                <span>
-                    {{ values[field.name] ? values[field.name] : "Select date..." }}
-                </span>
-                <UIcon name="i-heroicons-calendar" />
-                </UButton>
-
-                <!-- Calendar popup -->
-                <template #content>
-                        <UCalendar
-                            v-bind="field.props"
-                            :model-value="values[field.name]"
-                            @update:model-value="(val:any) => {
-                                const formatted = val instanceof Date
-                                ? val.toISOString().split('T')[0]
-                                : val;
-                                onFieldChange(formatted, field, index);
-                            }"
-                        />
-                </template>
-            </UPopover>
-        </template>
+      <BaseDatePicker
+        v-if="field.component === 'UCalendar'"
+        :field="field"
+        :model-value="values[field.name]"
+        @update:model-value="onFieldChange($event, field, index)"
+      />
 
         <USelect
         v-else-if="field.component === 'USelect'"
@@ -44,7 +25,7 @@
       <!-- Dynamic Component -->
       <component
         v-else
-        :is="resolve(field.component)"
+        :is="resolveComponentMap[field.component]"
         :id="field.name"
         :type="field.type"
         v-bind="{ ...field.props, ...field.attrs }"
@@ -52,24 +33,17 @@
         @update:modelValue="onFieldChange($event, field, index)"
       />
 
-
-
-      <!-- Errors -->
       <p v-if="errors[field.name]" class="error">{{ errors[field.name] }}</p>
     </div>
-
-    <!-- <button type="submit" :disabled="!isValid">
-      Submit
-    </button> -->
-
   </form>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, resolveComponent, watch } from "vue";
+import { ref, computed , watch } from "vue";
 import { ZodError, type ZodTypeAny } from "zod";
 import { toCalendarDate, getLocalTimeZone, CalendarDate } from '@internationalized/date';
 import type { Field, ObjectGeneric } from "~/types/form-builder";
+import { resolveComponentMap } from "./ui-helper";
 // Props / Emits
 const props = defineProps<{
   modelValue?: Record<string, any>;
@@ -198,23 +172,6 @@ const isValid = computed(() => {
 });
 
 // -------------------------------------------------------------------
-// Resolve UI Component
-// -------------------------------------------------------------------
-const resolve = (name: string) => {
-  const map: Record<string, any> = {
-    UInput: resolveComponent("UInput"),
-    USelect: resolveComponent("USelect"),
-    UCheckbox: resolveComponent("UCheckbox"),
-    URadio: resolveComponent("URadio"),
-    UToggle: resolveComponent("UToggle"),
-    UTextarea: resolveComponent("UTextarea"),
-    UCheckboxGroup: resolveComponent("UCheckboxGroup"),
-    UCalendar: resolveComponent("UButton")
-  };
-  return map[name] ?? name;
-};
-
-// -------------------------------------------------------------------
 // Expose Methods (optional for parent usage)
 // -------------------------------------------------------------------
 defineExpose({
@@ -222,6 +179,7 @@ defineExpose({
   submit: handleSubmit,
   values,
   errors,
+  isValid
 });
 </script>
 
