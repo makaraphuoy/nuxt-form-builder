@@ -1,6 +1,21 @@
 <template>
+
+  <UModal fullscreen title="Configuration">
+    <div class="w-full flex justify-center pt-10">
+    <UButton label="View Configuration" color="primary" variant="solid" />
+
+    </div>
+    <template #body>
+      <UCard class="mt-10 w-10/12 mx-auto">
+      <pre class="bg-black/90 text-white p-4">{{ JSON.stringify(jobApplicationFormConfig,undefined,2) }}</pre>
+    </UCard>
+    </template>
+  </UModal>
+
   <div class="min-h-screen bg-gray-50 p-8">
     <!-- Wizard -->
+
+
     <BuilderWizardFormContainer
       ref="wizard"
       :config="jobApplicationFormConfig"
@@ -43,6 +58,7 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
