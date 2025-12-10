@@ -24,6 +24,7 @@
     <!-- Actions -->
     <div class="w-6/12 mx-auto mt-10 flex justify-between gap-4">
       <UButton
+        class="sm:p-2.5 sm:px-6"
         variant="outline"
         :disabled="!canGoBack"
         @click="onBack"
@@ -41,6 +42,7 @@
         </UButton>
 
         <UButton
+        class="sm:px-8"
           v-if="!isLastPage"
           color="primary"
           @click="onNext"
@@ -65,6 +67,16 @@
 import { BuilderWizardFormContainer } from "#components";
 import { ref, computed } from "vue"
 import { jobApplicationFormConfig } from "~/constants/form-builder"
+
+definePageMeta({
+  title: 'ESB Form Builder',
+  description: 'ESB',
+  image: '/og.png',
+  author: 'Makara',
+  keywords: 'ESB, Form',
+  ogType: 'website',
+  name: 'esb-maff', 
+})
 
 const wizard = ref<any>(null)
 const toast = useToast();
@@ -93,8 +105,17 @@ const onBack = () => {
 }
 
 const onNext = async () => {
+  toast.clear();
   const valid = wizard.value?.validatePage()
-  if (!valid) return
+  if (!valid) {
+    toast.add({
+        title: "សូមពិនិត្យម្តងទៀត",
+        description: "សូមបំពេញ​ឬ​ដែលលម្អិតដែលត្រូវការ",
+        color: "primary",
+        icon: "i-heroicons-exclamation-circle"
+    })
+    return
+  }
 
   wizard.value?.savePage()
   wizard.value?.next()

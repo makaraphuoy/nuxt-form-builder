@@ -67,6 +67,16 @@ import { z } from "zod";
 import { CalendarDate } from "@internationalized/date";
 import type { Field } from "~/types/form-builder";
 
+definePageMeta({
+  title: 'ESB Form Builder',
+  description: 'ESB',
+  image: '/og.png',
+  author: 'Makara',
+  keywords: 'ESB, Form',
+  ogType: 'website',
+  name: 'esb-maff', 
+})
+
 // ============ SCHEMAS ============
 const basicInfoSchema = z.object({
   email: z.string().email("Invalid email"),

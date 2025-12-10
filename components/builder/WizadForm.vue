@@ -24,6 +24,7 @@
           :field="field"
           accept="image/*"
           class="w-28 h-28 object-cover"
+          icon="i-lucide-user"
           :label="field.description"
           :model-value="values[field.name]"
           @update:model-value="onFieldChange($event, field, index)"

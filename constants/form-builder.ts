@@ -51,13 +51,49 @@ export const jobApplicationFormConfig: FormConfig = {
           icon: "i-heroicons-user",
           fields: [
             {
+              name: "registration_choice",
+              label: "ប្រភេទការចុះឈ្មោះ",
+              component: "URadioGroup",
+              type: "radio",
+              validation: z.string().min(1, "សូមជ្រើសរើសប្រភេទ"),
+              props: {
+                items: [
+                  { label: "ក្នុងតម្រូវការ", value: "existing" },
+                  { label: "ចុះបញ្ជីថ្មី", value: "new" }
+                ]
+              }
+            },
+            {
+            name: "search_info",
+            label: "ស្វែងរក ឬ ជ្រើសរើស",
+            component: "USelectMenu",
+            type: "text",
+            hidden: (values) => values.registration_choice !== "new",
+            dependsOn: ["registration_choice"],
+            validation: z.object({ label: z.string(), value: z.string() })
+              .or(z.string())
+              .transform(val => {
+                if (typeof val === 'object' && val !== null && 'value' in val) {
+                  return val.value
+                }
+                return String(val)
+              })
+              .pipe(z.string().min(1, 'សូមជ្រើសរើស')),
+            props: { 
+              items: [
+                {label: 'អាជ្ញាប័ណ្ណកសិដ្ឋាន', value: 'S0054'},
+                {label: 'អាជ្ញាប័ណ្ណជីកសិកម្ម', value: 'S0059'}
+              ]
+            }
+          },
+            {
               name: "first_name_khmer",
-              label: "ឈ្មោះខ្មែរ",
+              label: "ឈ្មោះខ្មែរ (Khmer Name)",
               component: "UInput",
               type: "text",
               row: 1,
               colSpan: 6,
-              validation: z.string().min(1, "Required"),
+              validation: z.string().min(1, "សូមបញ្ចូលឈ្មោះខ្មែរ"),
               props: { placeholder: "ឈ្មោះ" }
             },
             {
@@ -67,7 +103,7 @@ export const jobApplicationFormConfig: FormConfig = {
               type: "text",
               row: 1,
               colSpan: 6,
-              validation: z.string().min(1, "Required"),
+              validation: z.string().min(1, "សូមបញ្ចូលឈ្មោះឡាតាំង"),
               props: { placeholder: "First Name" }
             },
              {
@@ -78,7 +114,7 @@ export const jobApplicationFormConfig: FormConfig = {
               row: 1,
               colSpan: 6,
               validation: z
-                .instanceof(File, { message: "Required" }),
+                .instanceof(File, { message: "សូមបញ្ចូលរូប 4x6" }),
               props: {
                 accept: "image/*"
               }
@@ -90,7 +126,7 @@ export const jobApplicationFormConfig: FormConfig = {
               type: "date",
               row: 2,
               colSpan: 6,
-              validation: z.string().min(1, "Required"),
+              validation: z.string().min(1, "សូមបញ្ចូលថ្ងៃខែឆ្នាំកំណើត"),
               props: {}
             },
             {
@@ -100,7 +136,7 @@ export const jobApplicationFormConfig: FormConfig = {
               row: 2,
               colSpan: 6,
               type: "radio",
-              validation: z.string().min(1, "Required"),
+              validation: z.string().min(1, "សូមជ្រើសរើសភេទ"),
               props: {
                 items: [
                   { label: "ប្រុស", value: "M" },
@@ -143,10 +179,10 @@ export const jobApplicationFormConfig: FormConfig = {
               type: "text",
               row: 1,
               colSpan: 12,
-              validation: z.string().min(1, "Required"),
+              validation: z.string().min(1, "សូមជ្រើសរើសការងារ"),
               props: {
                 options: [
-                  { label: "ការងារឯកសណ្ឋាន", value: "employed" },
+                  { label: "ការងាររដ្ឋ", value: "employed" },
                   { label: "ការងារឯកជន", value: "self-employed" },
                   { label: "អត់ការងារ", value: "unemployed" }
                 ]
@@ -188,7 +224,7 @@ export const jobApplicationFormConfig: FormConfig = {
               hidden: (values) => values.employment_type !== "self-employed",
               dependsOn: ["employment_type"],
               clearOnChange: true,
-              validation: z.string().optional(),
+              validation: z.string().min(1,'សូមបញ្ចូលឈ្មោះអាជីវកម្ម'),
               props: { placeholder: "ឈ្មោះអាជីវកម្ម" }
             },
             {
@@ -201,7 +237,7 @@ export const jobApplicationFormConfig: FormConfig = {
               hidden: (values) => values.employment_type !== "self-employed",
               dependsOn: ["employment_type"],
               clearOnChange: true,
-              validation: z.string().optional(),
+              validation: z.string().min(1,'សូមជ្រើសរើសប្រភេទអាជីវកម្ម'),
               props: {
                 options: [
                   { label: "លក់ដូរ", value: "retail" },
@@ -272,7 +308,7 @@ export const jobApplicationFormConfig: FormConfig = {
           hidden: (values) => !values.skills?.includes("others"),
           dependsOn: ["skills"],
           clearOnChange: true,
-          validation: z.string().min(1, "Required when 'Others' is selected").optional(),
+          validation: z.string().min(1, "សូមបញ្ចូលជំនាញ សម្រាប់ការជ្រើសរើស 'Others'").optional(),
           props: { placeholder: "ឧ: React, Angular, etc." }
         },
         {

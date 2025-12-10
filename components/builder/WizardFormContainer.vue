@@ -77,18 +77,6 @@
         </UCard>
       </div>
     </UCard>
-
-    <!-- Error Summary (Optional) -->
-    <div v-if="Object.keys(pageErrors[currentPage.id]).length > 0" class="max-w-4xl mx-auto mt-4">
-      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <h3 class="font-semibold text-red-800 mb-2">Please fix the following errors:</h3>
-        <ul class="text-sm text-red-700 space-y-1">
-          <li v-for="error in pageErrors[currentPage.id]" :key="error">
-            • {{ error }}
-          </li>
-        </ul>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -167,6 +155,29 @@ const getAllPageFormRefs = (index = currentPageIndex.value) => {
 /* ---------------------------------------------------
  * Validation
  * --------------------------------------------------- */
+// const validatePage = (index = currentPageIndex.value): boolean => {
+//   const page = props.config.pages[index]
+//   const allRefs = getAllPageFormRefs(index)
+//   const errors: string[] = []
+
+//   let isValid = true
+
+//   // Validate all sections/forms on this page
+//   Object.values(allRefs).forEach(ref => {
+//     if (ref?.value) {
+//       const valid = ref.value.validateAll()
+//       if (!valid) {
+//         isValid = false
+//         errors.push(...(ref.value.errors || []))
+//       }
+//     }
+//   })
+
+//   pageErrors[page.id] = errors
+//   return isValid
+// }
+// In BuilderWizardFormContainer.vue - FIX THE VALIDATION FUNCTION
+
 const validatePage = (index = currentPageIndex.value): boolean => {
   const page = props.config.pages[index]
   const allRefs = getAllPageFormRefs(index)
@@ -175,20 +186,42 @@ const validatePage = (index = currentPageIndex.value): boolean => {
   let isValid = true
 
   // Validate all sections/forms on this page
-  Object.values(allRefs).forEach(ref => {
+  Object.entries(allRefs).forEach(([sectionId, ref]) => {
+    console.log(`🔍 Validating section: ${sectionId}`)
+    
     if (ref?.value) {
-      const valid = ref.value.validateAll()
+      const valid = ref.value.validateAll?.() ?? true
+      
       if (!valid) {
         isValid = false
-        errors.push(...(ref.value.errors || []))
+        
+        // ✅ FIX: Handle errors properly (they might be Object, not Array)
+        const sectionErrors = ref.value.errors
+        
+        if (Array.isArray(sectionErrors)) {
+          // If it's already an array, spread it
+          errors.push(...sectionErrors)
+        } else if (sectionErrors && typeof sectionErrors === 'object') {
+          // If it's an object, convert values to array
+          const errorMessages = Object.values(sectionErrors)
+            .filter(e => typeof e === 'string')
+            .map(e => String(e))
+          
+          errors.push(...errorMessages)
+        }
+        
+        // console.log(`❌ Section "${sectionId}" errors:`, ref.value.errors)
       }
     }
   })
 
   pageErrors[page.id] = errors
+  console.log('✅ Total page errors:', errors)
+  
   return isValid
 }
 
+// Also fix validateAll() for the same issue
 const validateAll = (): boolean => {
   for (let i = 0; i < props.config.pages.length; i++) {
     if (!validatePage(i)) {
