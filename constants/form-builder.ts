@@ -257,9 +257,23 @@ export const jobApplicationFormConfig: FormConfig = {
               { label: "Vue.js", value: "vue" },
               { label: "TypeScript", value: "typescript" },
               { label: "Tailwind CSS", value: "tailwind" },
-              { label: "Node.js", value: "nodejs" }
+              { label: "Node.js", value: "nodejs" },
+              { label: "ផ្សេងទៀត", value: "others" }
             ]
           }
+        },
+        {
+          name: "skills_other",
+          label: "បញ្ចូលជំនាញផ្សេងទៀត",
+          component: "UInput",
+          type: "text",
+          row: 2,
+          colSpan: 12,
+          hidden: (values) => !values.skills?.includes("others"),
+          dependsOn: ["skills"],
+          clearOnChange: true,
+          validation: z.string().min(1, "Required when 'Others' is selected").optional(),
+          props: { placeholder: "ឧ: React, Angular, etc." }
         },
         {
           name: "portfolio_url",
