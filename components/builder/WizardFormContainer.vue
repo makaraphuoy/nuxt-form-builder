@@ -6,7 +6,7 @@
           v-for="(page, index) in config.pages"
           :key="page.id"
           class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
-          @click="goTo(index)"
+          @click="currentPageIndex > 0 ? handlePrevious() : goTo(index)"
         >
           <div
             class="w-8 h-8 rounded-full flex items-center justify-center font-semibold"
