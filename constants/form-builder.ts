@@ -40,7 +40,7 @@ export const jobApplicationFormConfig: FormConfig = {
   pages: [
     {
       id: "personal-employment",
-      title: "Personal & Employment Info",
+      title: "ព័ត៌មាននៃមនុស្ស",
       description: "Complete your personal and employment details",
       // Using sections for multiple cards in one page
       sections: [
@@ -57,43 +57,70 @@ export const jobApplicationFormConfig: FormConfig = {
               type: "radio",
               validation: z.string().min(1, "សូមជ្រើសរើសប្រភេទ"),
               props: {
+                orientation: "horizontal",
                 items: [
                   { label: "ក្នុងតម្រូវការ", value: "existing" },
                   { label: "ចុះបញ្ជីថ្មី", value: "new" }
                 ]
               }
             },
+           {
+              name: "search_info",
+              label: "ស្វែងរក ឬ ជ្រើសរើស",
+              component: "UAsyncSelect",  // Custom async component
+              type: "text",
+              row:1,
+              colSpan: 6,
+              hidden: (values) => values.registration_choice !== "new",
+              dependsOn: ["registration_choice"],
+              validation: z.object({ label: z.string(), value: z.string() })
+                .or(z.string())
+                .transform(val => {
+                  if (typeof val === 'object' && val !== null && 'value' in val) {
+                    return val.value
+                  }
+                  return String(val)
+                })
+                .pipe(z.string().min(1, 'សូមជ្រើសរើស')),
+              props: {
+                placeholder: "ស្វែងរក...",
+                searchable: true,
+                clearable: true,
+                async: true,
+                apiEndpoint: "/api/licenses/search",
+                searchParam: "q",
+                transformResponse: (data: any[]) => {
+                  return data.map(item => ({
+                    label: item.name, // or item.license_name, etc
+                    value: item.code    // or item.code, etc
+                  }));
+                },
+                debounce: 300,
+                minChars: 2,
+                loadingText: "កំពុងស្វែងរក...",
+                noResultsText: "គ្មានលទ្ធផល"
+              }
+            },
             {
-            name: "search_info",
-            label: "ស្វែងរក ឬ ជ្រើសរើស",
-            component: "USelectMenu",
-            type: "text",
-            hidden: (values) => values.registration_choice !== "new",
-            dependsOn: ["registration_choice"],
-            validation: z.object({ label: z.string(), value: z.string() })
-              .or(z.string())
-              .transform(val => {
-                if (typeof val === 'object' && val !== null && 'value' in val) {
-                  return val.value
-                }
-                return String(val)
-              })
-              .pipe(z.string().min(1, 'សូមជ្រើសរើស')),
-            props: { 
-              items: [
-                {label: 'អាជ្ញាប័ណ្ណកសិដ្ឋាន', value: 'S0054'},
-                {label: 'អាជ្ញាប័ណ្ណជីកសិកម្ម', value: 'S0059'}
-              ]
-            }
-          },
+              name: "avatar",
+              label: "រូបភាព(៤x៦)",
+              component: "UFileUpload",
+              type: "file",
+
+              validation: z
+                .instanceof(File, { message: "សូមបញ្ចូល" }),
+              props: {
+                accept: "image/*"
+              }
+            },
             {
               name: "first_name_khmer",
-              label: "ឈ្មោះខ្មែរ (Khmer Name)",
+              label: "ឈ្មោះខ្មែរ",
               component: "UInput",
               type: "text",
               row: 1,
               colSpan: 6,
-              validation: z.string().min(1, "សូមបញ្ចូលឈ្មោះខ្មែរ"),
+              validation: z.string().min(1, "សូមបញ្ចូល"),
               props: { placeholder: "ឈ្មោះ" }
             },
             {
@@ -103,46 +130,36 @@ export const jobApplicationFormConfig: FormConfig = {
               type: "text",
               row: 1,
               colSpan: 6,
-              validation: z.string().min(1, "សូមបញ្ចូលឈ្មោះឡាតាំង"),
+              validation: z.string().min(1, "សូមបញ្ចូល"),
               props: { placeholder: "First Name" }
-            },
-             {
-              name: "avatar",
-              label: "រូបភាព",
-              component: "UFileUpload",
-              type: "file",
-              row: 1,
-              colSpan: 6,
-              validation: z
-                .instanceof(File, { message: "សូមបញ្ចូលរូប 4x6" }),
-              props: {
-                accept: "image/*"
-              }
-            },
-            {
-              name: "date_of_birth",
-              label: "ថ្ងៃខែឆ្នាំកំណើត",
-              component: "UCalendar",
-              type: "date",
-              row: 2,
-              colSpan: 6,
-              validation: z.string().min(1, "សូមបញ្ចូលថ្ងៃខែឆ្នាំកំណើត"),
-              props: {}
             },
             {
               name: "gender",
               label: "ភេទ",
               component: "URadioGroup",
               row: 2,
-              colSpan: 6,
+              colSpan: 12,
               type: "radio",
-              validation: z.string().min(1, "សូមជ្រើសរើសភេទ"),
+              validation: z.string().min(1, "សូមបញ្ចូល"),
               props: {
+                orientation: "horizontal",
                 items: [
                   { label: "ប្រុស", value: "M" },
                   { label: "ស្រី", value: "F" }
                 ]
               }
+            },
+
+
+             {
+              name: "date_of_birth",
+              label: "ថ្ងៃខែឆ្នាំកំណើត",
+              component: "UCalendar",
+              type: "date",
+              row: 3,
+              colSpan: 6,
+              validation: z.string().min(1, "សូមបញ្ចូល"),
+              props: {}
             },
             {
               name: "email",
@@ -178,8 +195,8 @@ export const jobApplicationFormConfig: FormConfig = {
               component: "USelect",
               type: "text",
               row: 1,
-              colSpan: 12,
-              validation: z.string().min(1, "សូមជ្រើសរើសការងារ"),
+              colSpan: 6,
+              validation: z.string().min(1, "សូមបញ្ចូល"),
               props: {
                 options: [
                   { label: "ការងាររដ្ឋ", value: "employed" },
@@ -224,7 +241,7 @@ export const jobApplicationFormConfig: FormConfig = {
               hidden: (values) => values.employment_type !== "self-employed",
               dependsOn: ["employment_type"],
               clearOnChange: true,
-              validation: z.string().min(1,'សូមបញ្ចូលឈ្មោះអាជីវកម្ម'),
+              validation: z.string().min(1,'ទាមទារឈឈ្មោះអាជីវកម្ម'),
               props: { placeholder: "ឈ្មោះអាជីវកម្ម" }
             },
             {
@@ -237,7 +254,7 @@ export const jobApplicationFormConfig: FormConfig = {
               hidden: (values) => values.employment_type !== "self-employed",
               dependsOn: ["employment_type"],
               clearOnChange: true,
-              validation: z.string().min(1,'សូមជ្រើសរើសប្រភេទអាជីវកម្ម'),
+              validation: z.string().min(1,'ទាមទារ'),
               props: {
                 options: [
                   { label: "លក់ដូរ", value: "retail" },
@@ -264,8 +281,8 @@ export const jobApplicationFormConfig: FormConfig = {
               label: "បទពិសោធន៍ការងារ",
               component: "UTextarea",
               type: "text",
-              row: 3,
-              colSpan: 6,
+              row: 4,
+              colSpan: 12,
               validation: z.string().optional(),
               props: { placeholder: "បទពិសោធន៍ការងារ" }
             }
@@ -308,7 +325,7 @@ export const jobApplicationFormConfig: FormConfig = {
           hidden: (values) => !values.skills?.includes("others"),
           dependsOn: ["skills"],
           clearOnChange: true,
-          validation: z.string().min(1, "សូមបញ្ចូលជំនាញ សម្រាប់ការជ្រើសរើស 'Others'").optional(),
+          validation: z.string().min(1, "សូមបញ្ចូល when 'Others' is selected").optional(),
           props: { placeholder: "ឧ: React, Angular, etc." }
         },
         {
@@ -343,6 +360,54 @@ export const jobApplicationFormConfig: FormConfig = {
           colSpan: 12,
           validation: z.string().optional(),
           props: { placeholder: "Tell us about yourself..." }
+        }
+      ]
+    },
+    {
+      id: "documents",
+      title: "ឯកសារភ្ជាប់",
+      description: "ឯកសារភ្ជាប់",
+      fields: [
+        {
+          name: "D000001",
+          label: "ប្រវត្តិរូបសង្ខេប ដោយមានបញ្ជាក់ទទួលស្គាល់ពីមេឃុំ/ចៅសង្កាត់",
+          component: "UFileInput",
+          type: "file",
+          row: 2, // Starting row
+          colSpan: 6,
+          validation: z.instanceof(File, { message: "ទាមទារឯកសារ" }), // required: true
+          props: {
+            accept: "application/pdf",
+            placeholder: "Upload PDF",
+            sample_url: "documents/D000001.pdf"
+          }
+        },
+        {
+          name: "D000004",
+          label: "កិច្ចសន្យាស្តីពីការបង្កើតកសិដ្ឋានចិញ្ចឹមសត្វ និង/ឬ បង្កាត់ពូជសត្វ",
+          component: "UFileInput",
+          type: "file",
+          row: 3,
+          colSpan: 6,
+          validation: z.instanceof(File, { message: "ទាមទារឯកសារ" }), // required: true
+          props: {
+            accept: "application/pdf",
+            placeholder: "Upload PDF",
+            sample_url: "documents/D000004.pdf"
+          }
+        },
+        {
+          name: "D000005",
+          label: "ផ្សេងទៀត",
+          component: "UFileInput",
+          type: "file",
+          row: 4,
+          colSpan: 6,
+          validation: z.instanceof(File).optional(), // required: false
+          props: {
+            accept: "application/pdf",
+            placeholder: "Upload PDF",
+          }
         }
       ]
     }

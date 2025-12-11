@@ -5,12 +5,12 @@
       <div
         v-for="(field,index) in fieldsByRow(rowNumber)"
         :key="field.name"
-        :class="getColumnClass(field)"
+        :class="getGridClass(rowNumber)"
       >
         <!-- Label -->  
         <label :for="field.name" class="label">
           {{ field.label }}
-        </label>
+        </label>  
 
         <BaseDatePicker
           v-if="field.component === 'UCalendar'"
@@ -38,6 +38,14 @@
           :items="getFieldOptions(field)"
           :model-value="values[field.name]"
           @update:model-value="onFieldChange($event, field, index)"
+          :disabled="isFieldDisabled(field)"
+        />
+        <BaseAsynSelect
+          v-else-if="field.component === 'UAsyncSelect'"
+          :id="field.name"
+          :field="field"
+          :model-value="values[field.name]"
+          @update:model-value="onFieldChange($event, field,index)"
           :disabled="isFieldDisabled(field)"
         />
 
