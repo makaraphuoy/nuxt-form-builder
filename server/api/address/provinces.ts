@@ -24,17 +24,16 @@ export default defineEventHandler(async (event) => {
     { code: "22", name_en: "Svay Rieng", name_kh: "ស្វាយរៀង" },
     { code: "23", name_en: "Takeo", name_kh: "តាកែវ" },
     { code: "24", name_en: "Tboung Khmum", name_kh: "ត្បូងឃ្មុំ" },
-    { code: "25", name_en: "Prey Veng", name_kh: "ព្រៃវែង" }
+    { code: "25", name_en: "Prey Veng", name_kh: "ព្រៃវែង" },
   ];
 
   try {
-
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     return provinces; // Limit to 10 results
   } catch (error) {
-    console.error('Search error:', error);
-    throw createError({ statusCode: 500, message: 'Search failed' });
+    console.error("Search error:", error);
+    throw createError({ statusCode: 500, message: "Search failed" });
   }
 });

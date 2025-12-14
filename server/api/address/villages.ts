@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
       district_code: "0101",
       commune_code: "010101",
       name_en: "Village 1",
-      name_kh: "ភូមិទី១"
+      name_kh: "ភូមិទី១",
     },
     {
       code: "01010102",
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
       district_code: "0101",
       commune_code: "010101",
       name_en: "Village 2",
-      name_kh: "ភូមិទី២"
+      name_kh: "ភូមិទី២",
     },
 
     // Phnom Penh → Chamkar Mon → Tonle Bassac
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
       district_code: "0102",
       commune_code: "010201",
       name_en: "Tonle Bassac Village",
-      name_kh: "ភូមិទន្លេបាសាក់"
+      name_kh: "ភូមិទន្លេបាសាក់",
     },
 
     // Preah Sihanouk → Buon
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
       district_code: "0201",
       commune_code: "020101",
       name_en: "Buon Village",
-      name_kh: "ភូមិបួន"
+      name_kh: "ភូមិបួន",
     },
 
     // Kampot → Kampong Bay
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
       district_code: "0301",
       commune_code: "030101",
       name_en: "Kampong Bay Village",
-      name_kh: "ភូមិកំពង់បាយ"
+      name_kh: "ភូមិកំពង់បាយ",
     },
 
     // Siem Reap → Svay Dangkum
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
       district_code: "0401",
       commune_code: "040101",
       name_en: "Svay Dangkum Village",
-      name_kh: "ភូមិស្វាយដង្គំ"
+      name_kh: "ភូមិស្វាយដង្គំ",
     },
 
     // Battambang → Svay Por
@@ -71,19 +71,19 @@ export default defineEventHandler(async (event) => {
       district_code: "0501",
       commune_code: "050101",
       name_en: "Svay Por Village",
-      name_kh: "ភូមិស្វាយពរ"
-    }
+      name_kh: "ភូមិស្វាយពរ",
+    },
   ];
 
   try {
-    const results = villages.filter(d => d.commune_code === query);
+    const results = villages.filter((d) => d.commune_code === query);
 
     // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     return results; // Limit to 10 results
   } catch (error) {
-    console.error('Search error:', error);
-    throw createError({ statusCode: 500, message: 'Search failed' });
+    console.error("Search error:", error);
+    throw createError({ statusCode: 500, message: "Search failed" });
   }
 });
