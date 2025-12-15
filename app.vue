@@ -3,7 +3,7 @@
     <NuxtPage />
   </UApp>
 </template>
-<script lang="ts">
+<script setup lang="ts">
 const url = useRequestURL();
 const SITE_NAME = "ESB-FORM";
 const SITE_DESCRIPTION = "Form Builder";
