@@ -18,7 +18,7 @@ const emit = defineEmits<{
   change: [field: string, value: any];
 }>();
 
-const { values, errors, visibleFields, rowGroups, setValue, isDisabled, getOptions, validate } =
+const { values, errors, visibleFields, setValue, isDisabled, getOptions, validate } =
   useFormState(props.fields, props.initialValues);
 
 // schema rebuilds when visible fields change (hidden fields are excluded)
@@ -30,9 +30,24 @@ const schema = computed(() => {
   return z.object(shape);
 });
 
-// col-span class: full width on mobile, colSpan on sm+
+// col-span lookup — full static strings required for Tailwind JIT to include them
+const COL_SPAN: Record<number, string> = {
+  1:  "col-span-12 sm:col-span-1",
+  2:  "col-span-12 sm:col-span-2",
+  3:  "col-span-12 sm:col-span-3",
+  4:  "col-span-12 sm:col-span-4",
+  5:  "col-span-12 sm:col-span-5",
+  6:  "col-span-12 sm:col-span-6",
+  7:  "col-span-12 sm:col-span-7",
+  8:  "col-span-12 sm:col-span-8",
+  9:  "col-span-12 sm:col-span-9",
+  10: "col-span-12 sm:col-span-10",
+  11: "col-span-12 sm:col-span-11",
+  12: "col-span-12 sm:col-span-12",
+};
+
 function colSpanClass(field: FieldWithConditions): string {
-  return `col-span-12 sm:col-span-${field.colSpan ?? 12}`;
+  return COL_SPAN[field.colSpan ?? 12] ?? "col-span-12";
 }
 
 function handleFieldChange(field: FieldWithConditions, newValue: any) {
@@ -67,14 +82,10 @@ defineExpose({ values, errors, validate: validateForm });
     class="space-y-4"
     @submit="onSubmit"
   >
-    <!-- fields grouped by row, each row is a 12-col grid -->
-    <div
-      v-for="(rowFields, rowIndex) in rowGroups"
-      :key="rowIndex"
-      class="grid grid-cols-12 gap-4"
-    >
+    <!-- single 12-col grid — CSS auto-flow packs col-span-* fields into rows -->
+    <div class="grid grid-cols-12 gap-4">
       <div
-        v-for="field in rowFields"
+        v-for="field in visibleFields"
         :key="field.name"
         :class="colSpanClass(field)"
       >

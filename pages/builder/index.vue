@@ -262,9 +262,18 @@ function onDrop(sectionId: string, index: number, e: DragEvent) {
 }
 
 function recalcRows() {
-  for (const page of pages.value)
-    for (const sec of page.sections)
-      sec.fields.forEach((f, i) => { f.row = i + 1; });
+  for (const page of pages.value) {
+    for (const sec of page.sections) {
+      let row = 1;
+      let used = 0;
+      for (const field of sec.fields) {
+        const span = field.colSpan ?? 12;
+        if (used + span > 12) { row++; used = 0; }
+        field.row = row;
+        used += span;
+      }
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -688,7 +697,7 @@ onMounted(() => {
             <UInput :model-value="selectedField.placeholder" placeholder="Hint text…" size="sm" @update:model-value="updateSelected({ placeholder: $event as string })" />
           </UFormField>
           <UFormField label="Width">
-            <USelect :model-value="selectedField.colSpan ?? 12" :items="colSpanOptions" size="sm" @update:model-value="updateSelected({ colSpan: Number($event) })" />
+            <USelect :model-value="selectedField.colSpan ?? 12" :items="colSpanOptions" size="sm" @update:model-value="updateSelected({ colSpan: Number($event) }); recalcRows()" />
           </UFormField>
           <div class="flex items-center justify-between">
             <span class="text-sm text-gray-700">Required</span>
