@@ -42,7 +42,7 @@ const cards = [
     label: "V2",
     badge: "primary",
     icon: "i-heroicons-squares-2x2",
-    title: "DEMO: Wizard Form",
+    title: "DEMO Form",
     description:
       "Multi-page wizard using the V2 FormBuilder and composable-driven state management.",
     to: "/v2/wizard",
@@ -66,7 +66,7 @@ const cards = [
     label: "Builder",
     badge: "warning",
     icon: "i-heroicons-cursor-arrow-rays",
-    title: "Form Builder",
+    title: "Form Builder Playground",
     description:
       "Drag-and-drop visual builder to create forms and save them to localStorage or export JSON.",
     to: "/builder",
