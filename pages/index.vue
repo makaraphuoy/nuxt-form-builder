@@ -78,12 +78,18 @@ const cards = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-16">
+  <div class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-10">
     <UContainer>
       <div class="max-w-5xl mx-auto">
         <!-- Hero -->
-        <div class="text-center mb-14">
-          <div class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm text-gray-600 shadow-xs mb-6">
+        <div class="text-center mb-8">
+                  <div class="flex justify-center mb-2">
+            <UBadge color="primary" variant="subtle" size="xl" class="gap-1">
+              <UIcon name="i-heroicons-tag" class="size-3" />
+              v2.0.1
+            </UBadge>
+          </div>
+          <div class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm text-gray-600 shadow-xs mb-3">
             <UIcon name="i-heroicons-sparkles" class="size-4 text-primary-500" />
             Nuxt 3 · Nuxt UI v3 · Zod v4 · Vue 3.5
           </div>
