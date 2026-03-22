@@ -97,11 +97,16 @@ function handleSubmit(data: Record<string, any>) {
             </UButton>
           </div>
 
-          <!-- Single-page form -->
-          <template v-if="runtimeConfig.pages.length === 1">
+          <!-- Single-page with sections → wizard handles section layout + displayStyle -->
+          <template v-if="runtimeConfig.pages.length === 1 && runtimeConfig.pages[0].sections">
+            <V2WizardRenderer :config="runtimeConfig" @submit="handleSubmit" />
+          </template>
+
+          <!-- Single-page flat fields (original behaviour preserved) -->
+          <template v-else-if="runtimeConfig.pages.length === 1">
             <UCard>
               <V2FormRenderer
-                :fields="runtimeConfig.pages[0].fields ?? runtimeConfig.pages[0].sections?.[0]?.fields ?? []"
+                :fields="runtimeConfig.pages[0].fields ?? []"
                 @submit="handleSubmit"
               >
                 <template #actions="{ submit }">

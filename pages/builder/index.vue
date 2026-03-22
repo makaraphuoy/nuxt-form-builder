@@ -19,6 +19,7 @@ interface CanvasSection {
   title: string;
   description?: string;
   icon?: string;
+  displayStyle?: 'card' | 'collapse' | 'plain';
   fields: CanvasField[];
 }
 
@@ -416,7 +417,12 @@ function toJSONField(f: CanvasField): JSONField {
 
 function buildConfig(): JSONFormConfig {
   const jsonPages = pages.value.map((page) => {
-    const hasSingleUnnamedSection = page.sections.length === 1 && !page.sections[0].description && !page.sections[0].icon;
+    // collapse to flat fields only when it's a single plain unnamed section with no style set
+    const hasSingleUnnamedSection =
+      page.sections.length === 1 &&
+      !page.sections[0].description &&
+      !page.sections[0].icon &&
+      !page.sections[0].displayStyle;
 
     if (hasSingleUnnamedSection) {
       return {
@@ -436,6 +442,7 @@ function buildConfig(): JSONFormConfig {
         title: sec.title,
         description: sec.description,
         icon: sec.icon,
+        displayStyle: sec.displayStyle,
         fields: sec.fields.map(toJSONField),
       } as JSONSection)),
     };
@@ -479,6 +486,7 @@ function loadSaved(id: string) {
           title: js.title ?? "Section",
           description: js.description,
           icon: js.icon,
+          displayStyle: js.displayStyle,
           fields: js.fields.map(f => ({ ...f, _id: uid() }) as CanvasField),
         }))
       : [{ _id: uid(), title: "Section 1", fields: (jp.fields ?? []).map(f => ({ ...f, _id: uid() }) as CanvasField) }],
@@ -825,6 +833,15 @@ onMounted(() => {
           <UFormField label="Icon (Heroicons)">
             <UInput v-model="currentSection.icon" placeholder="i-heroicons-user" size="sm" />
           </UFormField>
+          <UFormField label="Display Style">
+            <USelect
+              :model-value="currentSection.displayStyle ?? 'card'"
+              :items="['card' , 'collapse' , 'plain']"
+              size="sm"
+              class="w-[70%]"
+              @update:model-value="currentSection.displayStyle = ($event as 'card' | 'collapse' | 'plain')"
+            />
+          </UFormField>
         </div>
 
         <!-- Page config -->
@@ -857,8 +874,13 @@ onMounted(() => {
             </div>
           </template>
           <div v-if="previewConfig" :key="previewKey">
-            <template v-if="previewConfig.pages.length === 1">
-              <V2FormRenderer :fields="previewConfig.pages[0].fields ?? previewConfig.pages[0].sections?.[0]?.fields ?? []" @submit="(d) => { console.log('Preview:', d); showPreview = false; }">
+            <!-- single-page with sections → wizard handles section layout -->
+            <template v-if="previewConfig.pages.length === 1 && previewConfig.pages[0].sections">
+              <V2WizardRenderer :config="previewConfig" @submit="(d) => { console.log('Preview:', d); showPreview = false; }" />
+            </template>
+            <!-- single-page flat fields → simple renderer -->
+            <template v-else-if="previewConfig.pages.length === 1">
+              <V2FormRenderer :fields="previewConfig.pages[0].fields ?? []" @submit="(d) => { console.log('Preview:', d); showPreview = false; }">
                 <template #actions>
                   <div class="flex justify-end pt-2 gap-2">
                     <UButton variant="ghost" color="neutral" @click="showPreview = false">Close</UButton>
@@ -867,6 +889,7 @@ onMounted(() => {
                 </template>
               </V2FormRenderer>
             </template>
+            <!-- multi-page wizard -->
             <template v-else>
               <V2WizardRenderer :config="previewConfig" @submit="(d: Record<string, any>) => { console.log('Preview:', d); showPreview = false; }" />
             </template>

@@ -29,6 +29,17 @@ props.config.pages.forEach((page) => {
 // refs keyed by "pageId:sectionId" (or "pageId:main" for flat pages)
 const formRefs = ref<Record<string, any>>({});
 
+// collapse-style sections: track open state (all open by default)
+const openSections = ref<Set<string>>(
+  new Set(props.config.pages.flatMap(p => p.sections?.map(s => s.id) ?? []))
+);
+function toggleSection(id: string) {
+  const next = new Set(openSections.value);
+  if (next.has(id)) next.delete(id);
+  else next.add(id);
+  openSections.value = next;
+}
+
 function registerRef(key: string, el: any) {
   if (el) formRefs.value[key] = el;
   else delete formRefs.value[key];
@@ -118,8 +129,8 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
 
 <template>
   <div>
-    <!-- progress steps -->
-    <div class="mb-8 px-1">
+    <!-- progress steps — hidden for single-page forms -->
+    <div v-if="config.pages.length > 1" class="mb-8 px-1">
       <div class="flex items-center">
         <template v-for="(page, index) in config.pages" :key="page.id">
           <button type="button" class="flex flex-col items-center gap-1.5 group" @click="goTo(index)">
@@ -156,25 +167,80 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
 
     <!-- sectioned page -->
     <div v-if="currentPage.sections" class="space-y-6">
-      <UCard v-for="section in currentPage.sections" :key="section.id">
-        <template #header>
-          <div class="flex items-center gap-3">
+      <template v-for="section in currentPage.sections" :key="section.id">
+
+        <!-- card (default) — identical markup to original -->
+        <UCard v-if="!section.displayStyle || section.displayStyle === 'card'">
+          <template #header>
+            <div class="flex items-center gap-3">
+              <UIcon v-if="section.icon" :name="section.icon" class="size-5 text-primary-600 shrink-0" />
+              <div>
+                <h3 class="text-base font-semibold text-gray-900">{{ section.title }}</h3>
+                <p v-if="section.description" class="text-sm text-gray-500 mt-0.5">{{ section.description }}</p>
+              </div>
+            </div>
+          </template>
+          <V2FormRenderer
+            :key="`${currentPage.id}:${section.id}`"
+            :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
+            :fields="(section as FormSection).fields"
+            :initial-values="formData[currentPage.id]?.[section.id]"
+            hide-actions
+            @submit="() => {}"
+          />
+        </UCard>
+
+        <!-- collapse — bordered box with toggle, v-show keeps component mounted so validation works -->
+        <div v-else-if="section.displayStyle === 'collapse'" class="border border-gray-200 rounded-xl overflow-hidden bg-white">
+          <button
+            type="button"
+            class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
+            @click="toggleSection(section.id)"
+          >
+            <div class="flex items-center gap-3">
+              <UIcon v-if="section.icon" :name="section.icon" class="size-5 text-primary-600 shrink-0" />
+              <div class="text-left">
+                <p class="text-base font-semibold text-gray-900">{{ section.title }}</p>
+                <p v-if="section.description" class="text-sm text-gray-500">{{ section.description }}</p>
+              </div>
+            </div>
+            <UIcon
+              :name="openSections.has(section.id) ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+              class="size-5 text-gray-400 shrink-0"
+            />
+          </button>
+          <div v-show="openSections.has(section.id)" class="px-4 pb-4 pt-3 border-t border-gray-100">
+            <V2FormRenderer
+              :key="`${currentPage.id}:${section.id}`"
+              :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
+              :fields="(section as FormSection).fields"
+              :initial-values="formData[currentPage.id]?.[section.id]"
+              hide-actions
+              @submit="() => {}"
+            />
+          </div>
+        </div>
+
+        <!-- plain — no wrapper card, just title + form inline -->
+        <div v-else class="space-y-3">
+          <div v-if="section.title || section.icon" class="flex items-center gap-2 pb-2 border-b border-gray-100">
             <UIcon v-if="section.icon" :name="section.icon" class="size-5 text-primary-600 shrink-0" />
             <div>
-              <h3 class="text-base font-semibold text-gray-900">{{ section.title }}</h3>
-              <p v-if="section.description" class="text-sm text-gray-500 mt-0.5">{{ section.description }}</p>
+              <p class="text-base font-semibold text-gray-900">{{ section.title }}</p>
+              <p v-if="section.description" class="text-sm text-gray-500">{{ section.description }}</p>
             </div>
           </div>
-        </template>
-        <V2FormRenderer
-          :key="`${currentPage.id}:${section.id}`"
-          :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
-          :fields="(section as FormSection).fields"
-          :initial-values="formData[currentPage.id]?.[section.id]"
-          hide-actions
-          @submit="() => {}"
-        />
-      </UCard>
+          <V2FormRenderer
+            :key="`${currentPage.id}:${section.id}`"
+            :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
+            :fields="(section as FormSection).fields"
+            :initial-values="formData[currentPage.id]?.[section.id]"
+            hide-actions
+            @submit="() => {}"
+          />
+        </div>
+
+      </template>
     </div>
 
     <!-- flat-fields page -->
