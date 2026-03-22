@@ -20,7 +20,9 @@ export const formTemplates: JSONFormConfig[] = [
             placeholder: "John",
             colSpan: 6,
             row: 1,
-            validation: [{ type: "min", value: 2, message: "At least 2 characters" }],
+            validation: [
+              { type: "min", value: 2, message: "At least 2 characters" },
+            ],
           },
           {
             name: "lastName",
@@ -30,7 +32,9 @@ export const formTemplates: JSONFormConfig[] = [
             placeholder: "Doe",
             colSpan: 6,
             row: 1,
-            validation: [{ type: "min", value: 2, message: "At least 2 characters" }],
+            validation: [
+              { type: "min", value: 2, message: "At least 2 characters" },
+            ],
           },
           {
             name: "email",
@@ -59,7 +63,9 @@ export const formTemplates: JSONFormConfig[] = [
               { label: "Partnership", value: "partnership" },
               { label: "Other", value: "other" },
             ],
-            validation: [{ type: "required", message: "Please select a subject" }],
+            validation: [
+              { type: "required", message: "Please select a subject" },
+            ],
           },
           {
             name: "subjectOther",
@@ -82,7 +88,9 @@ export const formTemplates: JSONFormConfig[] = [
             colSpan: 12,
             row: 5,
             props: { rows: 4 },
-            validation: [{ type: "min", value: 10, message: "At least 10 characters" }],
+            validation: [
+              { type: "min", value: 10, message: "At least 10 characters" },
+            ],
           },
         ],
       },
@@ -114,7 +122,9 @@ export const formTemplates: JSONFormConfig[] = [
                 placeholder: "Your full name",
                 colSpan: 12,
                 row: 1,
-                validation: [{ type: "min", value: 3, message: "At least 3 characters" }],
+                validation: [
+                  { type: "min", value: 3, message: "At least 3 characters" },
+                ],
               },
               {
                 name: "email",
@@ -137,7 +147,9 @@ export const formTemplates: JSONFormConfig[] = [
                 placeholder: "+855 xx xxx xxx",
                 colSpan: 6,
                 row: 2,
-                validation: [{ type: "min", value: 8, message: "Enter a valid phone" }],
+                validation: [
+                  { type: "min", value: 8, message: "Enter a valid phone" },
+                ],
               },
               {
                 name: "gender",
@@ -175,7 +187,9 @@ export const formTemplates: JSONFormConfig[] = [
                 placeholder: "Software Engineer",
                 colSpan: 6,
                 row: 1,
-                validation: [{ type: "required", message: "Position required" }],
+                validation: [
+                  { type: "required", message: "Position required" },
+                ],
               },
               {
                 name: "yearsExp",
@@ -191,7 +205,9 @@ export const formTemplates: JSONFormConfig[] = [
                   { label: "5–9 years", value: "5-9" },
                   { label: "10+ years", value: "10+" },
                 ],
-                validation: [{ type: "required", message: "Select experience range" }],
+                validation: [
+                  { type: "required", message: "Select experience range" },
+                ],
               },
               {
                 name: "skills",
@@ -202,7 +218,9 @@ export const formTemplates: JSONFormConfig[] = [
                 colSpan: 12,
                 row: 2,
                 props: { rows: 3 },
-                validation: [{ type: "min", value: 5, message: "At least 5 characters" }],
+                validation: [
+                  { type: "min", value: 5, message: "At least 5 characters" },
+                ],
               },
             ],
           },
@@ -221,7 +239,9 @@ export const formTemplates: JSONFormConfig[] = [
             colSpan: 12,
             row: 1,
             props: { rows: 8 },
-            validation: [{ type: "min", value: 50, message: "At least 50 characters" }],
+            validation: [
+              { type: "min", value: 50, message: "At least 50 characters" },
+            ],
           },
           {
             name: "startDate",

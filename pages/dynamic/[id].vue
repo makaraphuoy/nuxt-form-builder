@@ -10,9 +10,11 @@ const route = useRoute();
 const toast = useToast();
 const { loadForm } = useFormStorage();
 
-const { data: jsonConfig, pending, error } = await useFetch<JSONFormConfig>(
-  `/api/forms/${route.params.id}`,
-);
+const {
+  data: jsonConfig,
+  pending,
+  error,
+} = await useFetch<JSONFormConfig>(`/api/forms/${route.params.id}`);
 
 // fallback: check localStorage when API returns 404
 const localConfig = ref<JSONFormConfig | null>(null);
@@ -61,8 +63,13 @@ function handleSubmit(data: Record<string, any>) {
 
         <!-- Not found in API or localStorage -->
         <UCard v-else-if="error && !localConfig" class="text-center py-12">
-          <UIcon name="i-heroicons-exclamation-circle" class="size-12 text-red-400 mx-auto mb-4" />
-          <h2 class="text-lg font-semibold text-gray-900 mb-1">Form not found</h2>
+          <UIcon
+            name="i-heroicons-exclamation-circle"
+            class="size-12 text-red-400 mx-auto mb-4"
+          />
+          <h2 class="text-lg font-semibold text-gray-900 mb-1">
+            Form not found
+          </h2>
           <p class="text-gray-500 text-sm mb-4">
             No form template exists for "{{ route.params.id }}".
           </p>
@@ -80,8 +87,13 @@ function handleSubmit(data: Record<string, any>) {
                 </UBadge>
                 <span class="text-xs text-gray-400">{{ route.params.id }}</span>
               </div>
-              <h1 class="text-2xl font-bold text-gray-900">{{ activeConfig?.title }}</h1>
-              <p v-if="activeConfig?.description" class="text-gray-500 mt-1 text-sm">
+              <h1 class="text-2xl font-bold text-gray-900">
+                {{ activeConfig?.title }}
+              </h1>
+              <p
+                v-if="activeConfig?.description"
+                class="text-gray-500 mt-1 text-sm"
+              >
                 {{ activeConfig.description }}
               </p>
             </div>
@@ -98,7 +110,12 @@ function handleSubmit(data: Record<string, any>) {
           </div>
 
           <!-- Single-page with sections → wizard handles section layout + displayStyle -->
-          <template v-if="runtimeConfig.pages.length === 1 && runtimeConfig.pages[0].sections">
+          <template
+            v-if="
+              runtimeConfig.pages.length === 1 &&
+              runtimeConfig.pages[0].sections
+            "
+          >
             <V2WizardRenderer :config="runtimeConfig" @submit="handleSubmit" />
           </template>
 
@@ -111,7 +128,11 @@ function handleSubmit(data: Record<string, any>) {
               >
                 <template #actions="{ submit }">
                   <div class="flex justify-end pt-2">
-                    <UButton type="button" icon="i-heroicons-paper-airplane" @click="submit">
+                    <UButton
+                      type="button"
+                      icon="i-heroicons-paper-airplane"
+                      @click="submit"
+                    >
                       {{ activeConfig?.submitButtonText ?? "Submit" }}
                     </UButton>
                   </div>
@@ -129,13 +150,17 @@ function handleSubmit(data: Record<string, any>) {
           <UCard v-if="submittedData" class="mt-8">
             <template #header>
               <div class="flex items-center gap-2">
-                <UIcon name="i-heroicons-document-check" class="size-5 text-green-500" />
+                <UIcon
+                  name="i-heroicons-document-check"
+                  class="size-5 text-green-500"
+                />
                 <h3 class="font-semibold">Submitted Payload</h3>
               </div>
             </template>
-            <pre class="text-xs bg-gray-50 rounded p-3 overflow-auto max-h-80">{{
-              JSON.stringify(submittedData, null, 2)
-            }}</pre>
+            <pre
+              class="text-xs bg-gray-50 rounded p-3 overflow-auto max-h-80"
+              >{{ JSON.stringify(submittedData, null, 2) }}</pre
+            >
           </UCard>
         </template>
       </div>

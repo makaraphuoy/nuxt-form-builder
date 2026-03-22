@@ -12,8 +12,8 @@ const modal = useConfirmModal();
 
 // localStorage is only available on client
 onMounted(() => {
-  refresh()
-  console.log({D: forms});
+  refresh();
+  console.log({ D: forms });
 });
 
 function confirmDelete(id: string, name: string) {
@@ -22,7 +22,10 @@ function confirmDelete(id: string, name: string) {
     description: `"${name}" will be permanently removed from your saved forms.`,
     icon: "i-heroicons-trash",
     confirmLabel: "Delete",
-    onConfirm: () => { deleteForm(id); refresh(); },
+    onConfirm: () => {
+      deleteForm(id);
+      refresh();
+    },
   });
 }
 </script>
@@ -50,7 +53,7 @@ function confirmDelete(id: string, name: string) {
         <div v-if="pending" class="space-y-4">
           <USkeleton v-for="i in 3" :key="i" class="h-24 w-full rounded-xl" />
         </div>
-<!-- 
+        <!-- 
         <div v-else class="space-y-4">
           <UCard
             v-for="form in forms"
@@ -82,10 +85,17 @@ function confirmDelete(id: string, name: string) {
         <template v-if="savedForms.length > 0">
           <div class="mt-10 mb-4 flex items-center justify-between">
             <div>
-              <h2 class="text-lg font-semibold text-gray-900">My Saved Forms</h2>
+              <h2 class="text-lg font-semibold text-gray-900">
+                My Saved Forms
+              </h2>
               <p class="text-sm text-gray-500">Created in the visual builder</p>
             </div>
-            <UButton to="/builder" size="sm" variant="outline" leading-icon="i-heroicons-pencil-square">
+            <UButton
+              to="/builder"
+              size="sm"
+              variant="outline"
+              leading-icon="i-heroicons-pencil-square"
+            >
               Open Builder
             </UButton>
           </div>
@@ -97,17 +107,29 @@ function confirmDelete(id: string, name: string) {
               class="hover:shadow-md transition-shadow"
             >
               <div class="flex items-center justify-between">
-                <NuxtLink :to="`/dynamic/${form.id}`" class="flex items-center gap-4 flex-1 min-w-0">
-                  <div class="w-11 h-11 rounded-xl bg-warning-50 flex items-center justify-center shrink-0">
-                    <UIcon name="i-heroicons-cursor-arrow-rays" class="size-5 text-warning-600" />
+                <NuxtLink
+                  :to="`/dynamic/${form.id}`"
+                  class="flex items-center gap-4 flex-1 min-w-0"
+                >
+                  <div
+                    class="w-11 h-11 rounded-xl bg-warning-50 flex items-center justify-center shrink-0"
+                  >
+                    <UIcon
+                      name="i-heroicons-cursor-arrow-rays"
+                      class="size-5 text-warning-600"
+                    />
                   </div>
                   <div class="min-w-0">
-                    <p class="font-semibold text-gray-900 truncate">{{ form.name }}</p>
+                    <p class="font-semibold text-gray-900 truncate">
+                      {{ form.name }}
+                    </p>
                     <p class="text-xs text-gray-400 mt-0.5">
                       Saved {{ new Date(form.updatedAt).toLocaleDateString() }}
                     </p>
                     <div class="flex items-center gap-2 mt-1.5">
-                      <UBadge variant="subtle" color="warning" size="sm">Local</UBadge>
+                      <UBadge variant="subtle" color="warning" size="sm"
+                        >Local</UBadge
+                      >
                       <UBadge variant="subtle" color="neutral" size="sm">
                         {{ form.config.pages[0]?.fields?.length ?? 0 }} fields
                       </UBadge>
@@ -140,13 +162,22 @@ function confirmDelete(id: string, name: string) {
         <UCard class="mt-8 border-dashed">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <UIcon name="i-heroicons-plus-circle" class="size-6 text-primary-500" />
+              <UIcon
+                name="i-heroicons-plus-circle"
+                class="size-6 text-primary-500"
+              />
               <div>
                 <p class="font-semibold text-gray-900">Create your own form</p>
-                <p class="text-sm text-gray-500">Use the visual builder to drag-and-drop fields</p>
+                <p class="text-sm text-gray-500">
+                  Use the visual builder to drag-and-drop fields
+                </p>
               </div>
             </div>
-            <UButton to="/builder" variant="outline" trailing-icon="i-heroicons-arrow-right">
+            <UButton
+              to="/builder"
+              variant="outline"
+              trailing-icon="i-heroicons-arrow-right"
+            >
               Open Builder
             </UButton>
           </div>

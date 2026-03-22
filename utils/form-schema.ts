@@ -1,7 +1,11 @@
 import { z } from "zod";
 import type { ZodType } from "zod";
 import type { FieldWithConditions } from "~/types/form-builder";
-import type { FormConfig, FormPage, FormSection } from "~/constants/form-builder";
+import type {
+  FormConfig,
+  FormPage,
+  FormSection,
+} from "~/constants/form-builder";
 
 // Serializable condition types (no functions — safe for JSON / API)
 
@@ -46,7 +50,7 @@ export interface JSONSection {
   title?: string;
   description?: string;
   icon?: string;
-  displayStyle?: 'card' | 'collapse' | 'plain';
+  displayStyle?: "card" | "collapse" | "plain";
   fields: JSONField[];
 }
 
@@ -85,9 +89,19 @@ export function evalCondition(
     case "nin":
       return Array.isArray(rule.value) && !rule.value.includes(v);
     case "empty":
-      return v === null || v === undefined || v === "" || (Array.isArray(v) && v.length === 0);
+      return (
+        v === null ||
+        v === undefined ||
+        v === "" ||
+        (Array.isArray(v) && v.length === 0)
+      );
     case "notempty":
-      return v !== null && v !== undefined && v !== "" && !(Array.isArray(v) && v.length === 0);
+      return (
+        v !== null &&
+        v !== undefined &&
+        v !== "" &&
+        !(Array.isArray(v) && v.length === 0)
+      );
     default:
       return false;
   }
@@ -104,10 +118,11 @@ export function buildValidation(
 ): ZodType {
   if (OBJECT_VALUE_COMPONENTS.includes(component)) {
     const req = rules.find((r) => r.type === "required");
-    return z.any().refine(
-      (v) => v !== null && v !== undefined && typeof v === "object",
-      { message: req?.message ?? `${component} is required` },
-    );
+    return z
+      .any()
+      .refine((v) => v !== null && v !== undefined && typeof v === "object", {
+        message: req?.message ?? `${component} is required`,
+      });
   }
 
   // array-value components: use z.array() + min(1) for required
@@ -132,16 +147,10 @@ export function buildValidation(
         schema = (schema as any).url(rule.message);
         break;
       case "min":
-        schema = (schema as any).min(
-          Number(rule.value),
-          rule.message,
-        );
+        schema = (schema as any).min(Number(rule.value), rule.message);
         break;
       case "max":
-        schema = (schema as any).max(
-          Number(rule.value),
-          rule.message,
-        );
+        schema = (schema as any).max(Number(rule.value), rule.message);
         break;
       case "regex":
         if (rule.value) {
@@ -178,7 +187,11 @@ function interpretField(jf: JSONField): FieldWithConditions {
   };
 
   // UAddress: reconstruct queryParams function from serializable props
-  if (jf.component === "UAddress" && jf.props?.addressQueryParamKey && jf.props?.addressQueryParamSourceField) {
+  if (
+    jf.component === "UAddress" &&
+    jf.props?.addressQueryParamKey &&
+    jf.props?.addressQueryParamSourceField
+  ) {
     const paramKey = jf.props.addressQueryParamKey as string;
     const sourceField = jf.props.addressQueryParamSourceField as string;
     field.props = {
@@ -199,8 +212,15 @@ function interpretField(jf: JSONField): FieldWithConditions {
     field.validation = buildValidation(jf.validation, jf.component);
   } else if (jf.required) {
     const msg = `${jf.label || jf.name} is required`;
-    const usesObjectValue = ["UFileInput", "UFileUpload", "UAddress", "UAsyncSelect"].includes(jf.component);
-    const usesArrayValue = ["UCheckboxGroup", "UCheckbox"].includes(jf.component);
+    const usesObjectValue = [
+      "UFileInput",
+      "UFileUpload",
+      "UAddress",
+      "UAsyncSelect",
+    ].includes(jf.component);
+    const usesArrayValue = ["UCheckboxGroup", "UCheckbox"].includes(
+      jf.component,
+    );
     field.validation = usesObjectValue
       ? z.any().refine((v) => v !== null && v !== undefined, { message: msg })
       : usesArrayValue

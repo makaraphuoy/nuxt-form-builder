@@ -221,7 +221,10 @@ async function handleSubmit(data: any) {
             :key="feature.title"
           >
             <div class="flex items-start gap-3">
-              <UIcon :name="feature.icon" class="size-5 text-primary-500 mt-0.5 shrink-0" />
+              <UIcon
+                :name="feature.icon"
+                class="size-5 text-primary-500 mt-0.5 shrink-0"
+              />
               <div>
                 <p class="text-sm font-semibold text-gray-900">
                   {{ feature.title }}

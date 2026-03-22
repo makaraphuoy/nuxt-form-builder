@@ -110,7 +110,8 @@ export function useFormState(
         field.validation.parse(values[field.name]);
         errors[field.name] = undefined;
       } catch (e) {
-        errors[field.name] = (e as any)?.issues?.[0]?.message ?? "Invalid value";
+        errors[field.name] =
+          (e as any)?.issues?.[0]?.message ?? "Invalid value";
         allValid = false;
       }
     }

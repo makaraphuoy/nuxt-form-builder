@@ -13,23 +13,29 @@ const { open, options, loading, confirm, cancel } = useConfirmModal();
             <div
               v-if="options?.icon"
               class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-              :class="options?.confirmColor === 'error' || !options?.confirmColor
-                ? 'bg-red-100'
-                : options?.confirmColor === 'warning'
-                  ? 'bg-amber-100'
-                  : 'bg-primary-100'"
+              :class="
+                options?.confirmColor === 'error' || !options?.confirmColor
+                  ? 'bg-red-100'
+                  : options?.confirmColor === 'warning'
+                    ? 'bg-amber-100'
+                    : 'bg-primary-100'
+              "
             >
               <UIcon
                 :name="options.icon"
                 class="size-5"
-                :class="options?.confirmColor === 'error' || !options?.confirmColor
-                  ? 'text-red-600'
-                  : options?.confirmColor === 'warning'
-                    ? 'text-amber-600'
-                    : 'text-primary-600'"
+                :class="
+                  options?.confirmColor === 'error' || !options?.confirmColor
+                    ? 'text-red-600'
+                    : options?.confirmColor === 'warning'
+                      ? 'text-amber-600'
+                      : 'text-primary-600'
+                "
               />
             </div>
-            <h3 class="font-semibold text-gray-900 text-base">{{ options?.title }}</h3>
+            <h3 class="font-semibold text-gray-900 text-base">
+              {{ options?.title }}
+            </h3>
           </div>
         </template>
 

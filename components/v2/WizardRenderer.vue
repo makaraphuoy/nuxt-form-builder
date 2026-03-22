@@ -22,7 +22,9 @@ const formData = reactive<Record<string, any>>({});
 props.config.pages.forEach((page) => {
   formData[page.id] = props.initialValues?.[page.id] ?? {};
   if (page.sections) {
-    page.sections.forEach((section) => { formData[page.id][section.id] ??= {}; });
+    page.sections.forEach((section) => {
+      formData[page.id][section.id] ??= {};
+    });
   }
 });
 
@@ -31,7 +33,9 @@ const formRefs = ref<Record<string, any>>({});
 
 // collapse-style sections: track open state (all open by default)
 const openSections = ref<Set<string>>(
-  new Set(props.config.pages.flatMap(p => p.sections?.map(s => s.id) ?? []))
+  new Set(
+    props.config.pages.flatMap((p) => p.sections?.map((s) => s.id) ?? []),
+  ),
 );
 function toggleSection(id: string) {
   const next = new Set(openSections.value);
@@ -49,7 +53,9 @@ function registerRef(key: string, el: any) {
 
 const currentPage = computed(() => props.config.pages[currentPageIndex.value]);
 const isFirstPage = computed(() => currentPageIndex.value === 0);
-const isLastPage = computed(() => currentPageIndex.value === props.config.pages.length - 1);
+const isLastPage = computed(
+  () => currentPageIndex.value === props.config.pages.length - 1,
+);
 
 function refKeysForPage(pageId: string): string[] {
   const page = props.config.pages.find((p) => p.id === pageId);
@@ -116,7 +122,8 @@ async function handleSubmit() {
   const output: Record<string, any> = {};
   for (const page of props.config.pages) {
     if (page.sections) {
-      for (const section of page.sections) Object.assign(output, formData[page.id]?.[section.id] ?? {});
+      for (const section of page.sections)
+        Object.assign(output, formData[page.id]?.[section.id] ?? {});
     } else {
       Object.assign(output, formData[page.id] ?? {});
     }
@@ -124,7 +131,15 @@ async function handleSubmit() {
   emit("submit", output);
 }
 
-defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCurrentPage, getCurrentIndex: () => currentPageIndex.value });
+defineExpose({
+  currentPageIndex,
+  formData,
+  goNext,
+  goPrevious,
+  goTo,
+  validateCurrentPage,
+  getCurrentIndex: () => currentPageIndex.value,
+});
 </script>
 
 <template>
@@ -133,16 +148,25 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
     <div v-if="config.pages.length > 1" class="mb-8 px-1">
       <div class="flex items-center">
         <template v-for="(page, index) in config.pages" :key="page.id">
-          <button type="button" class="flex flex-col items-center gap-1.5 group" @click="goTo(index)">
+          <button
+            type="button"
+            class="flex flex-col items-center gap-1.5 group"
+            @click="goTo(index)"
+          >
             <div
               class="w-9 h-9 rounded-full flex items-center justify-center font-semibold text-sm transition-colors"
               :class="{
-                'bg-primary-600 text-white shadow-sm': index === currentPageIndex,
+                'bg-primary-600 text-white shadow-sm':
+                  index === currentPageIndex,
                 'bg-primary-100 text-primary-700': index < currentPageIndex,
                 'bg-gray-100 text-gray-400': index > currentPageIndex,
               }"
             >
-              <UIcon v-if="index < currentPageIndex" name="i-heroicons-check-20-solid" class="size-4" />
+              <UIcon
+                v-if="index < currentPageIndex"
+                name="i-heroicons-check-20-solid"
+                class="size-4"
+              />
               <span v-else>{{ index + 1 }}</span>
             </div>
             <span
@@ -168,21 +192,33 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
     <!-- sectioned page -->
     <div v-if="currentPage.sections" class="space-y-6">
       <template v-for="section in currentPage.sections" :key="section.id">
-
         <!-- card (default) — identical markup to original -->
         <UCard v-if="!section.displayStyle || section.displayStyle === 'card'">
           <template #header>
             <div class="flex items-center gap-3">
-              <UIcon v-if="section.icon" :name="section.icon" class="size-5 text-primary-600 shrink-0" />
+              <UIcon
+                v-if="section.icon"
+                :name="section.icon"
+                class="size-5 text-primary-600 shrink-0"
+              />
               <div>
-                <h3 class="text-base font-semibold text-gray-900">{{ section.title }}</h3>
-                <p v-if="section.description" class="text-sm text-gray-500 mt-0.5">{{ section.description }}</p>
+                <h3 class="text-base font-semibold text-gray-900">
+                  {{ section.title }}
+                </h3>
+                <p
+                  v-if="section.description"
+                  class="text-sm text-gray-500 mt-0.5"
+                >
+                  {{ section.description }}
+                </p>
               </div>
             </div>
           </template>
           <V2FormRenderer
             :key="`${currentPage.id}:${section.id}`"
-            :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
+            :ref="
+              (el: any) => registerRef(`${currentPage.id}:${section.id}`, el)
+            "
             :fields="(section as FormSection).fields"
             :initial-values="formData[currentPage.id]?.[section.id]"
             hide-actions
@@ -191,28 +227,48 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
         </UCard>
 
         <!-- collapse — bordered box with toggle, v-show keeps component mounted so validation works -->
-        <div v-else-if="section.displayStyle === 'collapse'" class="border border-gray-200 rounded-xl overflow-hidden bg-white">
+        <div
+          v-else-if="section.displayStyle === 'collapse'"
+          class="border border-gray-200 rounded-xl overflow-hidden bg-white"
+        >
           <button
             type="button"
             class="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors"
             @click="toggleSection(section.id)"
           >
             <div class="flex items-center gap-3">
-              <UIcon v-if="section.icon" :name="section.icon" class="size-5 text-primary-600 shrink-0" />
+              <UIcon
+                v-if="section.icon"
+                :name="section.icon"
+                class="size-5 text-primary-600 shrink-0"
+              />
               <div class="text-left">
-                <p class="text-base font-semibold text-gray-900">{{ section.title }}</p>
-                <p v-if="section.description" class="text-sm text-gray-500">{{ section.description }}</p>
+                <p class="text-base font-semibold text-gray-900">
+                  {{ section.title }}
+                </p>
+                <p v-if="section.description" class="text-sm text-gray-500">
+                  {{ section.description }}
+                </p>
               </div>
             </div>
             <UIcon
-              :name="openSections.has(section.id) ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+              :name="
+                openSections.has(section.id)
+                  ? 'i-heroicons-chevron-up'
+                  : 'i-heroicons-chevron-down'
+              "
               class="size-5 text-gray-400 shrink-0"
             />
           </button>
-          <div v-show="openSections.has(section.id)" class="px-4 pb-4 pt-3 border-t border-gray-100">
+          <div
+            v-show="openSections.has(section.id)"
+            class="px-4 pb-4 pt-3 border-t border-gray-100"
+          >
             <V2FormRenderer
               :key="`${currentPage.id}:${section.id}`"
-              :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
+              :ref="
+                (el: any) => registerRef(`${currentPage.id}:${section.id}`, el)
+              "
               :fields="(section as FormSection).fields"
               :initial-values="formData[currentPage.id]?.[section.id]"
               hide-actions
@@ -223,23 +279,35 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
 
         <!-- plain — no wrapper card, just title + form inline -->
         <div v-else class="space-y-3">
-          <div v-if="section.title || section.icon" class="flex items-center gap-2 pb-2 border-b border-gray-100">
-            <UIcon v-if="section.icon" :name="section.icon" class="size-5 text-primary-600 shrink-0" />
+          <div
+            v-if="section.title || section.icon"
+            class="flex items-center gap-2 pb-2 border-b border-gray-100"
+          >
+            <UIcon
+              v-if="section.icon"
+              :name="section.icon"
+              class="size-5 text-primary-600 shrink-0"
+            />
             <div>
-              <p class="text-base font-semibold text-gray-900">{{ section.title }}</p>
-              <p v-if="section.description" class="text-sm text-gray-500">{{ section.description }}</p>
+              <p class="text-base font-semibold text-gray-900">
+                {{ section.title }}
+              </p>
+              <p v-if="section.description" class="text-sm text-gray-500">
+                {{ section.description }}
+              </p>
             </div>
           </div>
           <V2FormRenderer
             :key="`${currentPage.id}:${section.id}`"
-            :ref="(el: any) => registerRef(`${currentPage.id}:${section.id}`, el)"
+            :ref="
+              (el: any) => registerRef(`${currentPage.id}:${section.id}`, el)
+            "
             :fields="(section as FormSection).fields"
             :initial-values="formData[currentPage.id]?.[section.id]"
             hide-actions
             @submit="() => {}"
           />
         </div>
-
       </template>
     </div>
 
@@ -247,8 +315,12 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
     <UCard v-else>
       <template #header>
         <div>
-          <h2 class="text-lg font-semibold text-gray-900">{{ currentPage.title }}</h2>
-          <p v-if="currentPage.description" class="text-sm text-gray-500 mt-1">{{ currentPage.description }}</p>
+          <h2 class="text-lg font-semibold text-gray-900">
+            {{ currentPage.title }}
+          </h2>
+          <p v-if="currentPage.description" class="text-sm text-gray-500 mt-1">
+            {{ currentPage.description }}
+          </p>
         </div>
       </template>
       <V2FormRenderer
@@ -263,11 +335,20 @@ defineExpose({ currentPageIndex, formData, goNext, goPrevious, goTo, validateCur
 
     <!-- navigation -->
     <div class="flex items-center justify-between mt-6">
-      <UButton v-if="!isFirstPage" variant="outline" leading-icon="i-heroicons-arrow-left" @click="goPrevious">
+      <UButton
+        v-if="!isFirstPage"
+        variant="outline"
+        leading-icon="i-heroicons-arrow-left"
+        @click="goPrevious"
+      >
         {{ config.previousButtonText ?? "Previous" }}
       </UButton>
       <div v-else />
-      <UButton v-if="!isLastPage" trailing-icon="i-heroicons-arrow-right" @click="goNext">
+      <UButton
+        v-if="!isLastPage"
+        trailing-icon="i-heroicons-arrow-right"
+        @click="goNext"
+      >
         {{ config.nextButtonText ?? "Next" }}
       </UButton>
       <UButton v-else color="primary" @click="handleSubmit">
