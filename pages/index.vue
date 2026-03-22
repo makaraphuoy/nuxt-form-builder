@@ -84,14 +84,19 @@ const cards = [
       <div class="max-w-5xl mx-auto">
         <!-- Hero -->
         <div class="text-center mb-8">
-                  <div class="flex justify-center mb-2">
+          <div class="flex justify-center mb-2">
             <UBadge color="primary" variant="subtle" size="xl" class="gap-1">
               <UIcon name="i-heroicons-tag" class="size-3" />
               v{{ pg.version }}
             </UBadge>
           </div>
-          <div class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm text-gray-600 shadow-xs mb-3">
-            <UIcon name="i-heroicons-sparkles" class="size-4 text-primary-500" />
+          <div
+            class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm text-gray-600 shadow-xs mb-3"
+          >
+            <UIcon
+              name="i-heroicons-sparkles"
+              class="size-4 text-primary-500"
+            />
             Nuxt 3 · Nuxt UI v3 · Zod v4 · Vue 3.5
           </div>
           <h1 class="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
@@ -119,29 +124,25 @@ const cards = [
               <div class="flex items-start justify-between mb-4">
                 <div
                   class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
-                  :class="
-                    card.highlight
-                      ? 'bg-primary-50'
-                      : 'bg-gray-100'
-                  "
+                  :class="card.highlight ? 'bg-primary-50' : 'bg-gray-100'"
                 >
                   <UIcon
                     :name="card.icon"
                     class="size-5"
-                    :class="card.highlight ? 'text-primary-600' : 'text-gray-500'"
+                    :class="
+                      card.highlight ? 'text-primary-600' : 'text-gray-500'
+                    "
                   />
                 </div>
-                <UBadge
-                  :color="card.badge as any"
-                  variant="soft"
-                  size="sm"
-                >
+                <UBadge :color="card.badge as any" variant="soft" size="sm">
                   {{ card.label }}
                 </UBadge>
               </div>
 
               <!-- Content -->
-              <h2 class="text-base font-semibold text-gray-900 mb-1.5 group-hover:text-primary-600 transition-colors">
+              <h2
+                class="text-base font-semibold text-gray-900 mb-1.5 group-hover:text-primary-600 transition-colors"
+              >
                 {{ card.title }}
               </h2>
               <p class="text-sm text-gray-500 mb-4 leading-relaxed">
@@ -164,7 +165,9 @@ const cards = [
               </ul>
 
               <!-- CTA -->
-              <div class="flex items-center gap-1 text-sm font-medium text-primary-600 group-hover:gap-2 transition-all">
+              <div
+                class="flex items-center gap-1 text-sm font-medium text-primary-600 group-hover:gap-2 transition-all"
+              >
                 {{ card.action }}
                 <UIcon name="i-heroicons-arrow-right" class="size-4" />
               </div>

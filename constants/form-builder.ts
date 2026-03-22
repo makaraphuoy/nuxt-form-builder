@@ -1,7 +1,7 @@
 // types/form-builder.ts
 import type { ZodTypeAny } from "zod";
 
-export type SectionDisplayStyle = 'card' | 'collapse' | 'plain';
+export type SectionDisplayStyle = "card" | "collapse" | "plain";
 
 export interface FormSection {
   id: string;

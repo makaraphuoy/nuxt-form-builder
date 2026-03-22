@@ -44,7 +44,10 @@ export function useFormStorage() {
     };
     const idx = savedForms.value.findIndex((f) => f.id === config.id);
     if (idx >= 0) {
-      savedForms.value[idx] = { ...entry, createdAt: savedForms.value[idx].createdAt };
+      savedForms.value[idx] = {
+        ...entry,
+        createdAt: savedForms.value[idx].createdAt,
+      };
     } else {
       savedForms.value.push(entry);
     }
@@ -61,7 +64,10 @@ export function useFormStorage() {
     persist();
   }
 
-  function updateForm(id: string, patch: Partial<Pick<SavedForm, "name" | "config">>) {
+  function updateForm(
+    id: string,
+    patch: Partial<Pick<SavedForm, "name" | "config">>,
+  ) {
     const idx = savedForms.value.findIndex((f) => f.id === id);
     if (idx < 0) return;
     savedForms.value[idx] = {

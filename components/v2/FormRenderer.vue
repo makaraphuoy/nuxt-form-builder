@@ -17,8 +17,15 @@ const emit = defineEmits<{
   change: [field: string, value: any];
 }>();
 
-const { values, errors, visibleFields, setValue, isDisabled, getOptions, validate } =
-  useFormState(props.fields, props.initialValues);
+const {
+  values,
+  errors,
+  visibleFields,
+  setValue,
+  isDisabled,
+  getOptions,
+  validate,
+} = useFormState(props.fields, props.initialValues);
 
 // schema rebuilds when visible fields change (hidden fields are excluded)
 const schema = computed(() => {
@@ -31,15 +38,15 @@ const schema = computed(() => {
 
 // col-span lookup — full static strings required for Tailwind JIT to include them
 const COL_SPAN: Record<number, string> = {
-  1:  "col-span-12 sm:col-span-1",
-  2:  "col-span-12 sm:col-span-2",
-  3:  "col-span-12 sm:col-span-3",
-  4:  "col-span-12 sm:col-span-4",
-  5:  "col-span-12 sm:col-span-5",
-  6:  "col-span-12 sm:col-span-6",
-  7:  "col-span-12 sm:col-span-7",
-  8:  "col-span-12 sm:col-span-8",
-  9:  "col-span-12 sm:col-span-9",
+  1: "col-span-12 sm:col-span-1",
+  2: "col-span-12 sm:col-span-2",
+  3: "col-span-12 sm:col-span-3",
+  4: "col-span-12 sm:col-span-4",
+  5: "col-span-12 sm:col-span-5",
+  6: "col-span-12 sm:col-span-6",
+  7: "col-span-12 sm:col-span-7",
+  8: "col-span-12 sm:col-span-8",
+  9: "col-span-12 sm:col-span-9",
   10: "col-span-12 sm:col-span-10",
   11: "col-span-12 sm:col-span-11",
   12: "col-span-12 sm:col-span-12",
@@ -102,7 +109,12 @@ defineExpose({ values, errors, validate: validateForm });
     </div>
 
     <template v-if="!hideActions">
-      <slot name="actions" :state="values" :validate="validateForm" :submit="handleSubmit">
+      <slot
+        name="actions"
+        :state="values"
+        :validate="validateForm"
+        :submit="handleSubmit"
+      >
         <div class="flex justify-end">
           <UButton type="button" @click="handleSubmit">Submit</UButton>
         </div>

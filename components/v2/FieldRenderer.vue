@@ -27,7 +27,10 @@ function getComponent(field: FieldWithConditions) {
 function onFileChange(e: Event) {
   const target = e.target as HTMLInputElement;
   const files = target.files;
-  if (!files || files.length === 0) { value.value = null; return; }
+  if (!files || files.length === 0) {
+    value.value = null;
+    return;
+  }
   const allowMultiple = props.field.props?.multiple ?? false;
   value.value = allowMultiple ? Array.from(files) : files[0];
 }

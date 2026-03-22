@@ -35,7 +35,8 @@ async function handleSubmit(data: Record<string, any>) {
             <div>
               <h1 class="text-2xl font-bold text-gray-900">V2 Wizard Form</h1>
               <p class="text-sm text-gray-500 mt-1">
-                Multi-step · Conditional fields · Cascading selects · Zod validation
+                Multi-step · Conditional fields · Cascading selects · Zod
+                validation
               </p>
             </div>
             <UBadge color="primary" variant="soft" size="lg">V2</UBadge>
@@ -61,9 +62,10 @@ async function handleSubmit(data: Record<string, any>) {
               <h3 class="font-semibold text-gray-900">Submitted Data</h3>
             </div>
           </template>
-          <pre class="text-xs bg-gray-50 rounded-lg p-4 overflow-auto max-h-96">{{
-            JSON.stringify(submittedData, null, 2)
-          }}</pre>
+          <pre
+            class="text-xs bg-gray-50 rounded-lg p-4 overflow-auto max-h-96"
+            >{{ JSON.stringify(submittedData, null, 2) }}</pre
+          >
         </UCard>
       </div>
     </UContainer>

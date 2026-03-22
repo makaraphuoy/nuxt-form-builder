@@ -28,92 +28,92 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { FieldWithConditions } from '~/types/form-builder'
-import { useFieldComponentRegistry } from '~/composables/useFieldComponentRegistry'
+import { computed } from "vue";
+import type { FieldWithConditions } from "~/types/form-builder";
+import { useFieldComponentRegistry } from "~/composables/useFieldComponentRegistry";
 
 interface Props {
-  field: FieldWithConditions
-  modelValue?: any
-  error?: string
-  disabled?: boolean
-  formValues?: Record<string, any>
+  field: FieldWithConditions;
+  modelValue?: any;
+  error?: string;
+  disabled?: boolean;
+  formValues?: Record<string, any>;
 }
 
 const emit = defineEmits<{
-  'update:model-value': [value: any]
-  'file-change': [files: FileList | null]
-}>()
+  "update:model-value": [value: any];
+  "file-change": [files: FileList | null];
+}>();
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   formValues: () => ({}),
-})
+});
 
 // ==========================================
 // Component Registry
 // ==========================================
-const { getComponent } = useFieldComponentRegistry()
+const { getComponent } = useFieldComponentRegistry();
 
 /**
  * Get the appropriate field component based on field type
  */
 const getFieldComponent = () => {
-  const componentName = props.field.component
-  const component = getComponent(componentName)
+  const componentName = props.field.component;
+  const component = getComponent(componentName);
 
   if (!component) {
-    console.warn(`Component not found: ${componentName}`)
-    return 'div'
+    console.warn(`Component not found: ${componentName}`);
+    return "div";
   }
 
-  return component
-}
+  return component;
+};
 
 /**
  * Get component-specific props based on field type
  */
 const getComponentProps = () => {
-  const baseProps: Record<string, any> = {}
+  const baseProps: Record<string, any> = {};
 
   // Add field options if available
   if (props.field.options) {
-    if (typeof props.field.options === 'function') {
-      baseProps.options = props.field.options(props.formValues)
-      baseProps.items = props.field.options(props.formValues)
+    if (typeof props.field.options === "function") {
+      baseProps.options = props.field.options(props.formValues);
+      baseProps.items = props.field.options(props.formValues);
     } else {
-      baseProps.options = props.field.options
-      baseProps.items = props.field.options
+      baseProps.options = props.field.options;
+      baseProps.items = props.field.options;
     }
   }
 
   // Merge with field props
   if (props.field.props) {
-    Object.assign(baseProps, props.field.props)
+    Object.assign(baseProps, props.field.props);
   }
 
   // Handle file input
-  if (props.field.type === 'file' || props.field.component === 'UFileInput') {
-    baseProps.multiple = props.field.props?.multiple ?? false
-    baseProps.accept = props.field.props?.accept ?? ''
+  if (props.field.type === "file" || props.field.component === "UFileInput") {
+    baseProps.multiple = props.field.props?.multiple ?? false;
+    baseProps.accept = props.field.props?.accept ?? "";
   }
 
   // Type for input elements
   if (props.field.type) {
-    baseProps.type = props.field.type
+    baseProps.type = props.field.type;
   }
 
-  return baseProps
-}
+  return baseProps;
+};
 
 /**
  * Handle file input changes
  * Emits to parent (FormBuilder) for processing
  */
 const handleFileChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('file-change', target.files)
-}
+  const target = event.target as HTMLInputElement;
+  emit("file-change", target.files);
+};
 </script>
 
 <style scoped>
