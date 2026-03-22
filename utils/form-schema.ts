@@ -48,6 +48,7 @@ export interface JSONSection {
   title?: string;
   description?: string;
   icon?: string;
+  displayStyle?: 'card' | 'collapse' | 'plain';
   fields: JSONField[];
 }
 
@@ -231,6 +232,7 @@ export function interpretConfig(json: JSONFormConfig): FormConfig {
         title: js.title ?? "",
         description: js.description,
         icon: js.icon,
+        displayStyle: js.displayStyle,
         fields: js.fields.map(interpretField),
       })) as FormSection[];
     } else if (jp.fields) {

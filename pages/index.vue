@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import pg from "~/package.json";
 definePageMeta({
   title: "ESB Form Builder",
 });
