@@ -14,9 +14,7 @@ const emit = defineEmits<{
   pageChange: [index: number];
 }>();
 
-// ---------------------------------------------------------------------------
 // State
-// ---------------------------------------------------------------------------
 
 const currentPageIndex = ref(0);
 const formData = reactive<Record<string, any>>({});
@@ -47,9 +45,7 @@ function registerRef(key: string, el: any) {
   else delete formRefs.value[key];
 }
 
-// ---------------------------------------------------------------------------
 // Computed
-// ---------------------------------------------------------------------------
 
 const currentPage = computed(() => props.config.pages[currentPageIndex.value]);
 const isFirstPage = computed(() => currentPageIndex.value === 0);
@@ -62,9 +58,7 @@ function refKeysForPage(pageId: string): string[] {
   return [`${pageId}:main`];
 }
 
-// ---------------------------------------------------------------------------
 // Page persistence & validation
-// ---------------------------------------------------------------------------
 
 function saveCurrentPage() {
   const page = currentPage.value;
@@ -91,9 +85,7 @@ async function validateCurrentPage(): Promise<boolean> {
   return allValid;
 }
 
-// ---------------------------------------------------------------------------
 // Navigation
-// ---------------------------------------------------------------------------
 
 async function goNext() {
   if (!(await validateCurrentPage())) return;
@@ -116,9 +108,7 @@ async function goTo(index: number) {
   emit("pageChange", index);
 }
 
-// ---------------------------------------------------------------------------
 // Submit — flatten all pages/sections into one object
-// ---------------------------------------------------------------------------
 
 async function handleSubmit() {
   if (!(await validateCurrentPage())) return;
