@@ -28,6 +28,14 @@ export interface JSONOption {
   value: string;
 }
 
+export interface TableColumn {
+  key: string;
+  label: string;
+  type: "text" | "number" | "select";
+  placeholder?: string;
+  options?: JSONOption[];
+}
+
 export interface JSONField {
   name: string;
   label?: string;
@@ -109,8 +117,9 @@ export function evalCondition(
 
 // Zod schema builder from ValidationRule[]
 
-const OBJECT_VALUE_COMPONENTS = ["UAddress", "UAsyncSelect"];
-const ARRAY_VALUE_COMPONENTS = ["UCheckboxGroup", "UCheckbox"];
+const OBJECT_VALUE_COMPONENTS = ["UAddress", "UAsyncSelect", "UDateRange"];
+const ARRAY_VALUE_COMPONENTS = ["UCheckboxGroup", "UCheckbox", "UTagInput"];
+const TABLE_COMPONENTS = ["UTableField", "URepeater"];
 
 export function buildValidation(
   rules: ValidationRule[],
@@ -128,6 +137,14 @@ export function buildValidation(
   // array-value components: use z.array() + min(1) for required
   if (ARRAY_VALUE_COMPONENTS.includes(component)) {
     let schema: ZodType = z.array(z.string());
+    const req = rules.find((r) => r.type === "required");
+    if (req) schema = (schema as any).min(1, req.message);
+    return schema;
+  }
+
+  // table field: array of row objects, min(1) for required
+  if (TABLE_COMPONENTS.includes(component)) {
+    let schema: ZodType = z.array(z.any());
     const req = rules.find((r) => r.type === "required");
     if (req) schema = (schema as any).min(1, req.message);
     return schema;
@@ -217,15 +234,17 @@ function interpretField(jf: JSONField): FieldWithConditions {
       "UFileUpload",
       "UAddress",
       "UAsyncSelect",
+      "UDateRange",
     ].includes(jf.component);
-    const usesArrayValue = ["UCheckboxGroup", "UCheckbox"].includes(
-      jf.component,
-    );
+    const usesArrayValue = ["UCheckboxGroup", "UCheckbox", "UTagInput"].includes(jf.component);
+    const usesTableValue = TABLE_COMPONENTS.includes(jf.component);
     field.validation = usesObjectValue
       ? z.any().refine((v) => v !== null && v !== undefined, { message: msg })
       : usesArrayValue
         ? z.array(z.string()).min(1, msg)
-        : z.string().min(1, msg);
+        : usesTableValue
+          ? z.array(z.any()).min(1, msg)
+          : z.string().min(1, msg);
   }
 
   return field;

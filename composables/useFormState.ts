@@ -22,6 +22,14 @@ function getFieldDefault(field: FieldWithConditions): any {
     case "UAsyncSelect":
     case "UAddress":
       return null; // object/complex values — use z.any() in validation
+    case "UTableField":
+    case "URepeater":
+    case "UTagInput":
+      return []; // array values
+    case "UDateRange":
+      return { start: "", end: "" };
+    case "UOtpInput":
+      return "";
     default:
       return field.type === "number" ? null : "";
   }

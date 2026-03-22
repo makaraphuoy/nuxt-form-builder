@@ -46,6 +46,9 @@ interface PaletteItem {
   isDatePicker?: boolean;
   isAsyncSelect?: boolean;
   isFileUpload?: boolean;
+  isTable?: boolean;
+  isOtp?: boolean;
+  isRepeater?: boolean;
 }
 
 // Palette
@@ -138,6 +141,34 @@ const palette: PaletteItem[] = [
     icon: "i-heroicons-map-pin",
     isAddressGroup: true,
   },
+  {
+    component: "UTableField",
+    label: "Table",
+    icon: "i-heroicons-table-cells",
+    isTable: true,
+  },
+  {
+    component: "UTagInput",
+    label: "Tag Input",
+    icon: "i-heroicons-tag",
+  },
+  {
+    component: "UDateRange",
+    label: "Date Range",
+    icon: "i-heroicons-calendar-days",
+  },
+  {
+    component: "UOtpInput",
+    label: "OTP / PIN",
+    icon: "i-heroicons-key",
+    isOtp: true,
+  },
+  {
+    component: "URepeater",
+    label: "Repeater Group",
+    icon: "i-heroicons-queue-list",
+    isRepeater: true,
+  },
 ];
 
 // State
@@ -181,6 +212,19 @@ const selectedField = computed(() => {
     for (const sec of page.sections)
       for (const f of sec.fields) if (f._id === selectedId.value) return f;
   return null;
+});
+
+// detect duplicate field names across all pages/sections
+const duplicateNames = computed<Set<string>>(() => {
+  const seen = new Set<string>();
+  const dupes = new Set<string>();
+  for (const page of pages.value)
+    for (const sec of page.sections)
+      for (const f of sec.fields) {
+        if (seen.has(f.name)) dupes.add(f.name);
+        else seen.add(f.name);
+      }
+  return dupes;
 });
 
 function selectField(id: string) {
@@ -432,6 +476,51 @@ function makeField(
       },
     ];
   }
+  if (item.isOtp) {
+    return [{
+      _id: uid(),
+      name: `field_${++_seq}`,
+      label: item.label,
+      component: "UOtpInput",
+      colSpan: 12,
+      row: sectionFields.length + 1,
+      props: { length: 6 },
+    }];
+  }
+  if (item.isRepeater) {
+    return [{
+      _id: uid(),
+      name: `field_${++_seq}`,
+      label: item.label,
+      component: "URepeater",
+      colSpan: 12,
+      row: sectionFields.length + 1,
+      props: {
+        fields: [
+          { key: "field1", label: "Field 1", type: "text" },
+          { key: "field2", label: "Field 2", type: "text" },
+        ],
+      },
+    }];
+  }
+  if (item.isTable) {
+    return [
+      {
+        _id: uid(),
+        name: `field_${++_seq}`,
+        label: item.label,
+        component: "UTableField",
+        colSpan: 12,
+        row: sectionFields.length + 1,
+        props: {
+          columns: [
+            { key: "col1", label: "Column 1", type: "text" },
+            { key: "col2", label: "Column 2", type: "text" },
+          ],
+        },
+      },
+    ];
+  }
   return [
     {
       _id: uid(),
@@ -595,7 +684,10 @@ const supportsValidation = [
   "URadioGroup",
   "USelectMenu",
 ];
-const supportsRequiredMessage = ["UAddress", "UAsyncSelect", "UCalendar"];
+const supportsRequiredMessage = [
+  "UAddress", "UAsyncSelect", "UCalendar",
+  "UTagInput", "UDateRange", "UOtpInput",
+];
 
 function getAddressRequiredMessage(field: CanvasField): string {
   return field.validation?.[0]?.message ?? "";
@@ -631,6 +723,96 @@ function updateItem(
   items[idx] = { ...items[idx], [key]: val };
   updateSelected({ items });
 }
+
+// Table column management
+function addTableColumn(field: CanvasField) {
+  const cols = [...(field.props?.columns ?? [])];
+  const n = cols.length + 1;
+  cols.push({ key: `col${n}`, label: `Column ${n}`, type: "text" });
+  updateSelected({ props: { ...field.props, columns: cols } });
+}
+function removeTableColumn(field: CanvasField, idx: number) {
+  const cols = [...(field.props?.columns ?? [])];
+  cols.splice(idx, 1);
+  updateSelected({ props: { ...field.props, columns: cols } });
+}
+function updateTableColumn(field: CanvasField, idx: number, patch: Record<string, any>) {
+  const cols = [...(field.props?.columns ?? [])] as any[];
+  cols[idx] = { ...cols[idx], ...patch };
+  updateSelected({ props: { ...field.props, columns: cols } });
+}
+function addTableColOption(field: CanvasField, colIdx: number) {
+  const cols = [...(field.props?.columns ?? [])] as any[];
+  const opts = [...(cols[colIdx].options ?? [])];
+  opts.push({ label: `Option ${opts.length + 1}`, value: `opt${opts.length + 1}` });
+  cols[colIdx] = { ...cols[colIdx], options: opts };
+  updateSelected({ props: { ...field.props, columns: cols } });
+}
+function removeTableColOption(field: CanvasField, colIdx: number, optIdx: number) {
+  const cols = [...(field.props?.columns ?? [])] as any[];
+  const opts = [...(cols[colIdx].options ?? [])];
+  opts.splice(optIdx, 1);
+  cols[colIdx] = { ...cols[colIdx], options: opts };
+  updateSelected({ props: { ...field.props, columns: cols } });
+}
+function updateTableColOption(field: CanvasField, colIdx: number, optIdx: number, key: "label" | "value", val: string) {
+  const cols = [...(field.props?.columns ?? [])] as any[];
+  const opts = [...(cols[colIdx].options ?? [])];
+  opts[optIdx] = { ...opts[optIdx], [key]: val };
+  cols[colIdx] = { ...cols[colIdx], options: opts };
+  updateSelected({ props: { ...field.props, columns: cols } });
+}
+
+// Repeater sub-field management (same shape as table columns, stored in props.fields)
+function addRepeaterField(field: CanvasField) {
+  const cols = [...(field.props?.fields ?? [])];
+  const n = cols.length + 1;
+  cols.push({ key: `field${n}`, label: `Field ${n}`, type: "text" });
+  updateSelected({ props: { ...field.props, fields: cols } });
+}
+function removeRepeaterField(field: CanvasField, idx: number) {
+  const cols = [...(field.props?.fields ?? [])];
+  cols.splice(idx, 1);
+  updateSelected({ props: { ...field.props, fields: cols } });
+}
+function updateRepeaterField(field: CanvasField, idx: number, patch: Record<string, any>) {
+  const cols = [...(field.props?.fields ?? [])] as any[];
+  cols[idx] = { ...cols[idx], ...patch };
+  updateSelected({ props: { ...field.props, fields: cols } });
+}
+function addRepeaterFieldOption(field: CanvasField, colIdx: number) {
+  const cols = [...(field.props?.fields ?? [])] as any[];
+  const opts = [...(cols[colIdx].options ?? [])];
+  opts.push({ label: `Option ${opts.length + 1}`, value: `opt${opts.length + 1}` });
+  cols[colIdx] = { ...cols[colIdx], options: opts };
+  updateSelected({ props: { ...field.props, fields: cols } });
+}
+function removeRepeaterFieldOption(field: CanvasField, colIdx: number, optIdx: number) {
+  const cols = [...(field.props?.fields ?? [])] as any[];
+  const opts = [...(cols[colIdx].options ?? [])];
+  opts.splice(optIdx, 1);
+  cols[colIdx] = { ...cols[colIdx], options: opts };
+  updateSelected({ props: { ...field.props, fields: cols } });
+}
+function updateRepeaterFieldOption(field: CanvasField, colIdx: number, optIdx: number, key: "label" | "value", val: string) {
+  const cols = [...(field.props?.fields ?? [])] as any[];
+  const opts = [...(cols[colIdx].options ?? [])];
+  opts[optIdx] = { ...opts[optIdx], [key]: val };
+  cols[colIdx] = { ...cols[colIdx], options: opts };
+  updateSelected({ props: { ...field.props, fields: cols } });
+}
+
+const colTypeOptions = [
+  { label: "Text", value: "text" },
+  { label: "Number", value: "number" },
+  { label: "Select", value: "select" },
+];
+
+const sectionStyleOptions = [
+  { label: "Card", value: "card" },
+  { label: "Collapse", value: "collapse" },
+  { label: "Plain", value: "plain" },
+];
 
 const colSpanOptions = [
   { label: "Full (12)", value: 12 },
@@ -1057,6 +1239,13 @@ onMounted(() => {
                             <span v-if="field.required" class="text-red-400"
                               >required</span
                             >
+                            <span
+                              v-if="duplicateNames.has(field.name)"
+                              class="text-orange-500 font-medium flex items-center gap-0.5"
+                            >
+                              <UIcon name="i-heroicons-exclamation-triangle" class="size-3" />
+                              duplicate key
+                            </span>
                           </p>
                         </div>
                       </div>
@@ -1147,6 +1336,13 @@ onMounted(() => {
               size="sm"
               @update:model-value="updateSelected({ name: $event as string })"
             />
+            <p
+              v-if="duplicateNames.has(selectedField.name)"
+              class="text-xs text-orange-500 flex items-center gap-1 mt-1"
+            >
+              <UIcon name="i-heroicons-exclamation-triangle" class="size-3.5" />
+              Duplicate key — another field uses this name. Form values will conflict.
+            </p>
           </UFormField>
           <UFormField label="Placeholder">
             <UInput
@@ -1410,6 +1606,163 @@ onMounted(() => {
             </div>
           </template>
 
+          <!-- Table columns config -->
+          <template v-if="selectedField.component === 'UTableField'">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-sm font-medium text-gray-700">Columns</p>
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  leading-icon="i-heroicons-plus"
+                  type="button"
+                  @click="addTableColumn(selectedField)"
+                >Add</UButton>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(col, ci) in (selectedField.props?.columns ?? [])"
+                  :key="ci"
+                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <UInput
+                      :model-value="col.label"
+                      placeholder="Label"
+                      size="xs"
+                      class="flex-1"
+                      @update:model-value="updateTableColumn(selectedField, ci, { label: $event as string })"
+                    />
+                    <UButton
+                      size="xs"
+                      variant="ghost"
+                      color="error"
+                      icon="i-heroicons-x-mark"
+                      type="button"
+                      @click="removeTableColumn(selectedField, ci)"
+                    />
+                  </div>
+                  <div class="flex gap-1.5">
+                    <UInput
+                      :model-value="col.key"
+                      placeholder="key"
+                      size="xs"
+                      class="flex-1"
+                      @update:model-value="updateTableColumn(selectedField, ci, { key: $event as string })"
+                    />
+                    <USelect
+                      :model-value="col.type"
+                      :items="colTypeOptions"
+                      size="xs"
+                      class="w-24"
+                      @update:model-value="updateTableColumn(selectedField, ci, { type: $event as string })"
+                    />
+                  </div>
+                  <!-- select column options -->
+                  <template v-if="col.type === 'select'">
+                    <div class="space-y-1.5 pl-1 border-l-2 border-gray-200">
+                      <div
+                        v-for="(opt, oi) in (col.options ?? [])"
+                        :key="oi"
+                        class="flex items-center gap-1"
+                      >
+                        <UInput
+                          :model-value="opt.label"
+                          placeholder="Label"
+                          size="xs"
+                          class="flex-1"
+                          @update:model-value="updateTableColOption(selectedField, ci, oi, 'label', $event as string)"
+                        />
+                        <UInput
+                          :model-value="opt.value"
+                          placeholder="Value"
+                          size="xs"
+                          class="flex-1"
+                          @update:model-value="updateTableColOption(selectedField, ci, oi, 'value', $event as string)"
+                        />
+                        <UButton
+                          size="xs"
+                          variant="ghost"
+                          color="error"
+                          icon="i-heroicons-x-mark"
+                          type="button"
+                          @click="removeTableColOption(selectedField, ci, oi)"
+                        />
+                      </div>
+                      <UButton
+                        size="xs"
+                        variant="ghost"
+                        leading-icon="i-heroicons-plus"
+                        type="button"
+                        @click="addTableColOption(selectedField, ci)"
+                      >Option</UButton>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- OTP length config -->
+          <template v-if="selectedField.component === 'UOtpInput'">
+            <UFormField label="PIN Length">
+              <UButtonGroup size="sm">
+                <UButton
+                  v-for="n in [4, 5, 6]"
+                  :key="n"
+                  type="button"
+                  :variant="(selectedField.props?.length ?? 6) === n ? 'solid' : 'outline'"
+                  :color="(selectedField.props?.length ?? 6) === n ? 'primary' : 'neutral'"
+                  @click="updateSelected({ props: { ...selectedField.props, length: n } })"
+                >{{ n }} digits</UButton>
+              </UButtonGroup>
+            </UFormField>
+          </template>
+
+          <!-- Repeater sub-fields config -->
+          <template v-if="selectedField.component === 'URepeater'">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-sm font-medium text-gray-700">Sub-fields</p>
+                <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" type="button" @click="addRepeaterField(selectedField)">Add</UButton>
+              </div>
+              <div class="space-y-3">
+                <div
+                  v-for="(col, ci) in (selectedField.props?.fields ?? [])"
+                  :key="ci"
+                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <UInput :model-value="col.label" placeholder="Label" size="xs" class="flex-1"
+                      @update:model-value="updateRepeaterField(selectedField, ci, { label: $event as string })" />
+                    <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark" type="button"
+                      @click="removeRepeaterField(selectedField, ci)" />
+                  </div>
+                  <div class="flex gap-1.5">
+                    <UInput :model-value="col.key" placeholder="key" size="xs" class="flex-1"
+                      @update:model-value="updateRepeaterField(selectedField, ci, { key: $event as string })" />
+                    <USelect :model-value="col.type" :items="colTypeOptions" size="xs" class="w-24"
+                      @update:model-value="updateRepeaterField(selectedField, ci, { type: $event as string })" />
+                  </div>
+                  <template v-if="col.type === 'select'">
+                    <div class="space-y-1.5 pl-1 border-l-2 border-gray-200">
+                      <div v-for="(opt, oi) in (col.options ?? [])" :key="oi" class="flex items-center gap-1">
+                        <UInput :model-value="opt.label" placeholder="Label" size="xs" class="flex-1"
+                          @update:model-value="updateRepeaterFieldOption(selectedField, ci, oi, 'label', $event as string)" />
+                        <UInput :model-value="opt.value" placeholder="Value" size="xs" class="flex-1"
+                          @update:model-value="updateRepeaterFieldOption(selectedField, ci, oi, 'value', $event as string)" />
+                        <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark" type="button"
+                          @click="removeRepeaterFieldOption(selectedField, ci, oi)" />
+                      </div>
+                      <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" type="button"
+                        @click="addRepeaterFieldOption(selectedField, ci)">Option</UButton>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
+
           <UButton
             block
             variant="soft"
@@ -1453,18 +1806,16 @@ onMounted(() => {
             />
           </UFormField>
           <UFormField label="Display Style">
-            <USelect
-              :model-value="currentSection.displayStyle ?? 'card'"
-              :items="['card', 'collapse', 'plain']"
-              size="sm"
-              class="w-[70%]"
-              @update:model-value="
-                currentSection.displayStyle = $event as
-                  | 'card'
-                  | 'collapse'
-                  | 'plain'
-              "
-            />
+            <UButtonGroup size="sm">
+              <UButton
+                v-for="opt in sectionStyleOptions"
+                :key="opt.value"
+                type="button"
+                :variant="(currentSection.displayStyle ?? 'card') === opt.value ? 'solid' : 'outline'"
+                :color="(currentSection.displayStyle ?? 'card') === opt.value ? 'primary' : 'neutral'"
+                @click="currentSection.displayStyle = (opt.value as 'card' | 'collapse' | 'plain')"
+              >{{ opt.label }}</UButton>
+            </UButtonGroup>
           </UFormField>
         </div>
 
