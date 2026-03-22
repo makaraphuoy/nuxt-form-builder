@@ -87,7 +87,7 @@ const cards = [
                   <div class="flex justify-center mb-2">
             <UBadge color="primary" variant="subtle" size="xl" class="gap-1">
               <UIcon name="i-heroicons-tag" class="size-3" />
-              v2.0.1
+              v{{ pg.version }}
             </UBadge>
           </div>
           <div class="inline-flex items-center gap-2 bg-white border border-gray-200 rounded-full px-4 py-1.5 text-sm text-gray-600 shadow-xs mb-3">
