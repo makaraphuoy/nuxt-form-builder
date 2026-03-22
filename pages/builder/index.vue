@@ -486,6 +486,7 @@ function loadSaved(id: string) {
           title: js.title ?? "Section",
           description: js.description,
           icon: js.icon,
+          displayStyle: js.displayStyle,
           fields: js.fields.map(f => ({ ...f, _id: uid() }) as CanvasField),
         }))
       : [{ _id: uid(), title: "Section 1", fields: (jp.fields ?? []).map(f => ({ ...f, _id: uid() }) as CanvasField) }],
@@ -835,8 +836,9 @@ onMounted(() => {
           <UFormField label="Display Style">
             <USelect
               :model-value="currentSection.displayStyle ?? 'card'"
-              :items="sectionStyleOptions"
+              :items="['card' , 'collapse' , 'plain']"
               size="sm"
+              class="w-[70%]"
               @update:model-value="currentSection.displayStyle = ($event as 'card' | 'collapse' | 'plain')"
             />
           </UFormField>
