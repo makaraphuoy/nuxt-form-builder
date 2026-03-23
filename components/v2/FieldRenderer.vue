@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FieldWithConditions } from "~/types/form-builder";
-import { resolveComponentMap } from "../builder/ui-helper";
+import { resolveComponentMap } from "../common/ui-helper";
 
 interface Props {
   field: FieldWithConditions;

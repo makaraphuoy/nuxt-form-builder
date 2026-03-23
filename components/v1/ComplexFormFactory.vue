@@ -71,7 +71,7 @@ import type {
   FieldWithConditions,
   ObjectGeneric,
 } from "~/types/form-builder";
-import { resolveComponentMap } from "./ui-helper";
+import { resolveComponentMap } from "../common/ui-helper";
 import { getColumnClass, getGridClass } from "./style-helper";
 
 const props = defineProps<{
