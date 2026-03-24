@@ -1550,7 +1550,10 @@ const COL_SPAN_CLASS: Record<number, string> = {
     <!-- Preview modal -->
     <UModal v-model:open="showPreview" class="max-w-2xl">
       <template #content>
-        <UCard>
+        <UCard
+          class="flex flex-col max-h-[90vh]"
+          :ui="{ body: 'overflow-y-auto flex-1 min-h-0' }"
+        >
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="font-semibold text-gray-900">
