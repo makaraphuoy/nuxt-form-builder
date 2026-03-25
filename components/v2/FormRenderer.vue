@@ -20,7 +20,8 @@ const emit = defineEmits<{
 }>();
 
 const allFields = computed<FieldWithConditions[]>(() => {
-  if (props.rows?.length) return props.rows.flatMap((r) => r.fields as FieldWithConditions[]);
+  if (props.rows?.length)
+    return props.rows.flatMap((r) => r.fields as FieldWithConditions[]);
   return (props.fields ?? []) as FieldWithConditions[];
 });
 
@@ -42,7 +43,9 @@ const schema = computed(() => {
   return z.object(shape);
 });
 
-const visibleNames = computed(() => new Set(visibleFields.value.map((f) => f.name)));
+const visibleNames = computed(
+  () => new Set(visibleFields.value.map((f) => f.name)),
+);
 
 const COL_SPAN: Record<number, string> = {
   1: "col-span-12 sm:col-span-1",
@@ -59,7 +62,11 @@ const COL_SPAN: Record<number, string> = {
   12: "col-span-12 sm:col-span-12",
 };
 
-const ROW_GAP: Record<string, string> = { sm: "gap-2", md: "gap-4", lg: "gap-6" };
+const ROW_GAP: Record<string, string> = {
+  sm: "gap-2",
+  md: "gap-4",
+  lg: "gap-6",
+};
 
 function rowContainerClass(row: FormRow): string {
   const gap = ROW_GAP[row.gap ?? "md"] ?? "gap-4";
@@ -75,7 +82,9 @@ function fieldInRowClass(row: FormRow, field: FieldWithConditions): string {
 }
 
 function visibleRowFields(row: FormRow): FieldWithConditions[] {
-  return (row.fields as FieldWithConditions[]).filter((f) => visibleNames.value.has(f.name));
+  return (row.fields as FieldWithConditions[]).filter((f) =>
+    visibleNames.value.has(f.name),
+  );
 }
 
 function colSpanClass(field: FieldWithConditions): string {
@@ -88,7 +97,9 @@ async function handleFieldChange(field: FieldWithConditions, newValue: any) {
   if (formRef.value) {
     try {
       await formRef.value.validate({ name: field.name, silent: true });
-    } catch { /* expected */ }
+    } catch {
+      /* expected */
+    }
   }
 }
 
@@ -123,11 +134,7 @@ defineExpose({ values, errors, validate: validateForm });
     <!-- Row-based rendering -->
     <template v-if="rows?.length">
       <div class="space-y-4">
-        <div
-          v-for="row in rows"
-          :key="row.id"
-          :class="rowContainerClass(row)"
-        >
+        <div v-for="row in rows" :key="row.id" :class="rowContainerClass(row)">
           <div
             v-for="field in visibleRowFields(row)"
             :key="field.name"

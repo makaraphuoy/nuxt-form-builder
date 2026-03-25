@@ -1,4 +1,8 @@
-import type { CanvasRow, CanvasSection, CanvasPage } from "~/pages/builder/config";
+import type {
+  CanvasRow,
+  CanvasSection,
+  CanvasPage,
+} from "~/pages/builder/config";
 
 let _seq = 0;
 

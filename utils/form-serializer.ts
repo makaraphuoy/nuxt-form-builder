@@ -1,5 +1,13 @@
-import type { JSONField, JSONFormConfig, JSONSection } from "~/utils/form-schema";
-import type { CanvasField, CanvasRow, CanvasPage } from "~/pages/builder/config";
+import type {
+  JSONField,
+  JSONFormConfig,
+  JSONSection,
+} from "~/utils/form-schema";
+import type {
+  CanvasField,
+  CanvasRow,
+  CanvasPage,
+} from "~/pages/builder/config";
 
 export function toJSONField(f: CanvasField): JSONField {
   const { _id, _group, ...rest } = f;

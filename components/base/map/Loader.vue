@@ -2,11 +2,16 @@
   <div v-if="isLoading" class="absolute inset-0 z-10 h-full w-full">
     <div class="relative h-full w-full overflow-hidden">
       <USkeleton class="h-full w-full" />
-      <div class="absolute inset-0 flex flex-col items-center justify-center gap-4">
+      <div
+        class="absolute inset-0 flex flex-col items-center justify-center gap-4"
+      >
         <div class="flex items-center gap-3">
-          <UIcon name="i-heroicons-map" class="text-primary h-8 w-8 animate-pulse" />
+          <UIcon
+            name="i-heroicons-map"
+            class="text-primary h-8 w-8 animate-pulse"
+          />
           <span class="text-lg font-medium">
-            {{ 'Load map' }}
+            {{ "Load map" }}
           </span>
         </div>
         <!-- Progress indicator -->
@@ -30,7 +35,7 @@
 defineProps({
   isLoading: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 </script>

@@ -11,7 +11,11 @@
         <UFormField class="w-full">
           <template #label>
             Pin
-            <UIcon class="align-top text-[#dc3545]" size="20" name="i-mdi-map-marker" />
+            <UIcon
+              class="align-top text-[#dc3545]"
+              size="20"
+              name="i-mdi-map-marker"
+            />
             to locate your location
           </template>
           <UInput
@@ -38,7 +42,9 @@
       </div>
     </template>
     <template #body>
-      <div class="relative h-[450px] w-full overflow-hidden rounded p-0 md:h-[600px]">
+      <div
+        class="relative h-[450px] w-full overflow-hidden rounded p-0 md:h-[600px]"
+      >
         <ClientOnly>
           <BaseMapLoader :is-loading="isMapLoading" />
           <!-- Current Location Button -->
@@ -57,9 +63,14 @@
           </div>
           <div id="map" ref="mapContainer" class="h-full w-full"></div>
           <template #fallback>
-            <div class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-500">
+            <div
+              class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-500"
+            >
               <div class="flex flex-col items-center space-y-3">
-                <UIcon name="i-heroicons-arrow-path" class="animate-spin text-4xl" />
+                <UIcon
+                  name="i-heroicons-arrow-path"
+                  class="animate-spin text-4xl"
+                />
                 <p>Loading map...</p>
               </div>
             </div>
@@ -176,20 +187,28 @@ const initMap = () => {
 
       const tileLayer = L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        { maxZoom: 19, crossOrigin: true }
+        { maxZoom: 19, crossOrigin: true },
       );
 
       let tilesLoading = 0;
       let tilesLoaded = 0;
-      tileLayer.on("tileloadstart", () => { tilesLoading++; });
+      tileLayer.on("tileloadstart", () => {
+        tilesLoading++;
+      });
       tileLayer.on("tileload", () => {
         tilesLoaded++;
         if (tilesLoaded >= tilesLoading && tilesLoading > 0) {
-          setTimeout(() => { isMapLoading.value = false; }, 200);
+          setTimeout(() => {
+            isMapLoading.value = false;
+          }, 200);
         }
       });
-      tileLayer.on("tileerror", () => { tilesLoaded++; });
-      setTimeout(() => { isMapLoading.value = false; }, 3000);
+      tileLayer.on("tileerror", () => {
+        tilesLoaded++;
+      });
+      setTimeout(() => {
+        isMapLoading.value = false;
+      }, 3000);
       tileLayer.addTo(map);
 
       marker = L.marker([center.value.lat, center.value.lng], {
@@ -215,7 +234,11 @@ const initMap = () => {
   } catch (error) {
     console.error("Error initializing map:", error);
     isMapLoading.value = false;
-    toast.add({ title: "Error", description: "Failed to initialize map", color: "error" });
+    toast.add({
+      title: "Error",
+      description: "Failed to initialize map",
+      color: "error",
+    });
   }
 };
 
@@ -254,7 +277,7 @@ const getUserLocation = () => {
         inputLat.value = center.value.lat.toString();
         inputLng.value = center.value.lng.toString();
       },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 },
     );
   } else {
     inputLat.value = center.value.lat.toString();
@@ -264,7 +287,11 @@ const getUserLocation = () => {
 
 const goToCurrentLocation = () => {
   if (!navigator.geolocation) {
-    toast.add({ title: "Error", description: "Geolocation is not supported by your browser", color: "error" });
+    toast.add({
+      title: "Error",
+      description: "Geolocation is not supported by your browser",
+      color: "error",
+    });
     return;
   }
   isGettingLocation.value = true;
@@ -295,31 +322,43 @@ const goToCurrentLocation = () => {
         }, 3000);
       }
       isGettingLocation.value = false;
-      toast.add({ title: "Success", description: "Located your current position", color: "success" });
+      toast.add({
+        title: "Success",
+        description: "Located your current position",
+        color: "success",
+      });
     },
     (error) => {
       console.error("Error getting current location:", error);
       isGettingLocation.value = false;
       let errorMessage = "Unable to get your location";
-      if (error.code === error.PERMISSION_DENIED) errorMessage = "Location permission denied. Please enable location access.";
-      else if (error.code === error.POSITION_UNAVAILABLE) errorMessage = "Location information is unavailable.";
-      else if (error.code === error.TIMEOUT) errorMessage = "Location request timed out.";
+      if (error.code === error.PERMISSION_DENIED)
+        errorMessage =
+          "Location permission denied. Please enable location access.";
+      else if (error.code === error.POSITION_UNAVAILABLE)
+        errorMessage = "Location information is unavailable.";
+      else if (error.code === error.TIMEOUT)
+        errorMessage = "Location request timed out.";
       toast.add({ title: "Error", description: errorMessage, color: "error" });
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
   );
 };
 
 const searchLocation = async () => {
   if (!searchQuery.value.trim()) {
-    toast.add({ title: "Error", description: "Please enter a location to search", color: "warning" });
+    toast.add({
+      title: "Error",
+      description: "Please enter a location to search",
+      color: "warning",
+    });
     return;
   }
   isSearching.value = true;
   try {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.value)}&limit=1`,
-      { headers: { Accept: "application/json" } }
+      { headers: { Accept: "application/json" } },
     );
     if (!response.ok) throw new Error("Search request failed");
     const data = await response.json();
@@ -336,15 +375,26 @@ const searchLocation = async () => {
       }
       toast.add({
         title: "Success",
-        description: formattedAddress.length > 80 ? formattedAddress.substring(0, 80) + "..." : formattedAddress,
+        description:
+          formattedAddress.length > 80
+            ? formattedAddress.substring(0, 80) + "..."
+            : formattedAddress,
         color: "success",
       });
     } else {
-      toast.add({ title: "Not Found", description: "No results found for your search", color: "warning" });
+      toast.add({
+        title: "Not Found",
+        description: "No results found for your search",
+        color: "warning",
+      });
     }
   } catch (error) {
     console.error("Error during geocoding:", error);
-    toast.add({ title: "Error", description: "Error searching location", color: "error" });
+    toast.add({
+      title: "Error",
+      description: "Error searching location",
+      color: "error",
+    });
   } finally {
     isSearching.value = false;
   }
@@ -387,17 +437,24 @@ watch(
       updateMarker(lat, lng);
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 const selectLocation = () => {
   const finalLat = parseFloat(inputLat.value || "");
   const finalLng = parseFloat(inputLng.value || "");
   if (!isNaN(finalLat) && !isNaN(finalLng)) {
-    emit("update:latLongValue", `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`);
+    emit(
+      "update:latLongValue",
+      `${finalLat.toFixed(6)}, ${finalLng.toFixed(6)}`,
+    );
     isOpen.value = false;
   } else {
-    toast.add({ title: "Error", description: "Invalid latitude or longitude", color: "error" });
+    toast.add({
+      title: "Error",
+      description: "Invalid latitude or longitude",
+      color: "error",
+    });
   }
 };
 

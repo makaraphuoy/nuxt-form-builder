@@ -1,7 +1,12 @@
 import { ref } from "vue";
 import type { Ref, ComputedRef } from "vue";
 import { makeField } from "~/pages/builder/config";
-import type { CanvasField, CanvasRow, CanvasPage, PaletteItem } from "~/pages/builder/config";
+import type {
+  CanvasField,
+  CanvasRow,
+  CanvasPage,
+  PaletteItem,
+} from "~/pages/builder/config";
 import { newRow } from "~/utils/canvas-factories";
 
 export function useBuilderDragDrop(params: {
@@ -13,9 +18,17 @@ export function useBuilderDragDrop(params: {
   rightPanel: Ref<"field" | "row" | "section" | "page" | null>;
   uid: () => string;
 }) {
-  const { pages, currentPage, activePageIdx, activeSectionIdx, selectedId, rightPanel, uid } = params;
+  const {
+    pages,
+    currentPage,
+    activePageIdx,
+    activeSectionIdx,
+    selectedId,
+    rightPanel,
+    uid,
+  } = params;
 
-  // Field drag state 
+  // Field drag state
   const draggingFrom = ref<"palette" | "canvas" | null>(null);
   const draggingPaletteItem = ref<PaletteItem | null>(null);
   const draggingCanvasId = ref<string | null>(null);
@@ -53,7 +66,7 @@ export function useBuilderDragDrop(params: {
     dragOverPageIdx.value = null;
   }
 
-  // Section tab drag & drop 
+  // Section tab drag & drop
   const draggingSectionIdx = ref<number | null>(null);
   const dragOverSectionTabIdx = ref<number | null>(null);
 
@@ -83,7 +96,7 @@ export function useBuilderDragDrop(params: {
     dragOverSectionTabIdx.value = null;
   }
 
-  // Row reorder drag & drop 
+  // Row reorder drag & drop
   const draggingRowId = ref<string | null>(null);
   const draggingRowSectionId = ref<string | null>(null);
   const dragOverRowId = ref<string | null>(null);
@@ -105,7 +118,10 @@ export function useBuilderDragDrop(params: {
     const srcRowId = draggingRowId.value;
     draggingRowId.value = null;
     dragOverRowId.value = null;
-    if (!srcRowId || draggingRowSectionId.value !== sectionId) { draggingRowSectionId.value = null; return; }
+    if (!srcRowId || draggingRowSectionId.value !== sectionId) {
+      draggingRowSectionId.value = null;
+      return;
+    }
     draggingRowSectionId.value = null;
     const section = currentPage.value.sections.find((s) => s._id === sectionId);
     if (!section) return;
@@ -120,7 +136,7 @@ export function useBuilderDragDrop(params: {
     dragOverRowId.value = null;
   }
 
-  // Palette & canvas field drag 
+  // Palette & canvas field drag
   function onPaletteDragStart(item: PaletteItem, e: DragEvent) {
     draggingFrom.value = "palette";
     draggingPaletteItem.value = item;
@@ -153,41 +169,64 @@ export function useBuilderDragDrop(params: {
   }
 
   function _isTabDragging() {
-    return draggingPageIdx.value !== null
-      || draggingSectionIdx.value !== null
-      || draggingRowId.value !== null;
+    return (
+      draggingPageIdx.value !== null ||
+      draggingSectionIdx.value !== null ||
+      draggingRowId.value !== null
+    );
   }
 
   // Drop field INTO an existing row at a field index
-  function onDropToRow(sectionId: string, rowId: string, fieldIndex: number, e: DragEvent) {
+  function onDropToRow(
+    sectionId: string,
+    rowId: string,
+    fieldIndex: number,
+    e: DragEvent,
+  ) {
     e.preventDefault();
     e.stopPropagation();
     dragOverSectionId.value = null;
     dragOverIndex.value = null;
     if (_isTabDragging()) return;
 
-    const targetSection = currentPage.value.sections.find((s) => s._id === sectionId);
+    const targetSection = currentPage.value.sections.find(
+      (s) => s._id === sectionId,
+    );
     if (!targetSection) return;
     const targetRow = targetSection.rows.find((r) => r._id === rowId);
     if (!targetRow) return;
 
     if (draggingFrom.value === "palette" && draggingPaletteItem.value) {
-      const newFields = makeField(draggingPaletteItem.value, targetRow.fields, uid);
+      const newFields = makeField(
+        draggingPaletteItem.value,
+        targetRow.fields,
+        uid,
+      );
       targetRow.fields.splice(fieldIndex, 0, ...newFields);
       selectedId.value = newFields[0]._id;
       rightPanel.value = "field";
     } else if (draggingFrom.value === "canvas" && draggingCanvasId.value) {
-      const srcSection = currentPage.value.sections.find((s) => s._id === draggingCanvasSectionId.value);
+      const srcSection = currentPage.value.sections.find(
+        (s) => s._id === draggingCanvasSectionId.value,
+      );
       if (!srcSection) return;
       let srcRow: CanvasRow | undefined;
       for (const row of srcSection.rows) {
-        if (row.fields.some((f) => f._id === draggingCanvasId.value)) { srcRow = row; break; }
+        if (row.fields.some((f) => f._id === draggingCanvasId.value)) {
+          srcRow = row;
+          break;
+        }
       }
       if (!srcRow) return;
-      const fromIdx = srcRow.fields.findIndex((f) => f._id === draggingCanvasId.value);
+      const fromIdx = srcRow.fields.findIndex(
+        (f) => f._id === draggingCanvasId.value,
+      );
       if (fromIdx < 0) return;
       const [moved] = srcRow.fields.splice(fromIdx, 1);
-      const insertAt = srcRow === targetRow && fromIdx < fieldIndex ? fieldIndex - 1 : fieldIndex;
+      const insertAt =
+        srcRow === targetRow && fromIdx < fieldIndex
+          ? fieldIndex - 1
+          : fieldIndex;
       targetRow.fields.splice(Math.max(0, insertAt), 0, moved);
     }
 
@@ -202,18 +241,28 @@ export function useBuilderDragDrop(params: {
     dragOverIndex.value = null;
     if (_isTabDragging() || draggingFrom.value === null) return;
 
-    const targetSection = currentPage.value.sections.find((s) => s._id === sectionId);
+    const targetSection = currentPage.value.sections.find(
+      (s) => s._id === sectionId,
+    );
     if (!targetSection) return;
 
     const newFields: CanvasField[] = [];
     if (draggingFrom.value === "palette" && draggingPaletteItem.value) {
       newFields.push(...makeField(draggingPaletteItem.value, [], uid));
     } else if (draggingFrom.value === "canvas" && draggingCanvasId.value) {
-      const srcSection = currentPage.value.sections.find((s) => s._id === draggingCanvasSectionId.value);
+      const srcSection = currentPage.value.sections.find(
+        (s) => s._id === draggingCanvasSectionId.value,
+      );
       if (srcSection) {
         for (const row of srcSection.rows) {
-          const idx = row.fields.findIndex((f) => f._id === draggingCanvasId.value);
-          if (idx >= 0) { const [moved] = row.fields.splice(idx, 1); newFields.push(moved); break; }
+          const idx = row.fields.findIndex(
+            (f) => f._id === draggingCanvasId.value,
+          );
+          if (idx >= 0) {
+            const [moved] = row.fields.splice(idx, 1);
+            newFields.push(moved);
+            break;
+          }
         }
       }
     }
@@ -223,7 +272,10 @@ export function useBuilderDragDrop(params: {
     row.fields = newFields;
     targetSection.rows.splice(rowIdx, 0, row);
 
-    if (draggingFrom.value === "palette") { selectedId.value = newFields[0]._id; rightPanel.value = "field"; }
+    if (draggingFrom.value === "palette") {
+      selectedId.value = newFields[0]._id;
+      rightPanel.value = "field";
+    }
     _clearFieldDrag();
   }
 

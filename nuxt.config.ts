@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["@nuxt/ui","@nuxtjs/leaflet"],
+  modules: ["@nuxt/ui", "@nuxtjs/leaflet"],
   css: ["~/assets/css/main.css"],
   colorMode: {
     preference: "light", // default value of $colorMode.preference

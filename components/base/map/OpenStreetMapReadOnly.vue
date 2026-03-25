@@ -15,16 +15,18 @@ import { customIcon } from "~/constants";
 const props = defineProps({
   center: {
     type: Object as PropType<{ lat: number; lng: number }>,
-    default: () => ({ lat: 11.568427, lng: 104.891796 })
+    default: () => ({ lat: 11.568427, lng: 104.891796 }),
   },
   zoom: {
     type: Number,
-    default: 10
+    default: 10,
   },
   markers: {
-    type: Array as PropType<Array<{ position: { lat: number; lng: number }; title?: string }>>,
-    default: () => []
-  }
+    type: Array as PropType<
+      Array<{ position: { lat: number; lng: number }; title?: string }>
+    >,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits(["mapClick", "beforeLoad", "mapLoaded"]);
@@ -41,7 +43,7 @@ const initMap = () => {
   map = L.map(mapContainer.value, {
     fadeAnimation: true,
     zoomAnimation: true,
-    attributionControl: false
+    attributionControl: false,
   }).setView([props.center.lat, props.center.lng], props.zoom);
   // Add OpenStreetMap tile layer with loading options
   const tileLayer = L.tileLayer(
@@ -52,8 +54,8 @@ const initMap = () => {
       keepBuffer: 4, // Keep more tiles in memory
       updateWhenIdle: false, // Load tiles while panning
       updateWhenZooming: false, // Don't load tiles while zooming
-      bounds: L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180))
-    }
+      bounds: L.latLngBounds(L.latLng(-90, -180), L.latLng(90, 180)),
+    },
   ).addTo(map);
   let tilesLoaded = false;
   tileLayer.once("load", () => {
@@ -90,10 +92,13 @@ const updateMarkers = () => {
   markerInstances = [];
   // Add new markers
   props.markers.forEach((markerData) => {
-    const marker = L.marker([markerData.position.lat, markerData.position.lng], {
-      title: markerData.title,
-      icon: customIcon
-    }).addTo(map!);
+    const marker = L.marker(
+      [markerData.position.lat, markerData.position.lng],
+      {
+        title: markerData.title,
+        icon: customIcon,
+      },
+    ).addTo(map!);
     markerInstances.push(marker);
   });
 };
@@ -106,7 +111,7 @@ watch(
       map.setView([newCenter.lat, newCenter.lng], map.getZoom());
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Watch for zoom changes
@@ -116,7 +121,7 @@ watch(
     if (map) {
       map.setZoom(newZoom);
     }
-  }
+  },
 );
 
 // Watch for marker changes
@@ -125,7 +130,7 @@ watch(
   () => {
     updateMarkers();
   },
-  { deep: true }
+  { deep: true },
 );
 
 onMounted(() => {

@@ -4,7 +4,12 @@ definePageMeta({
   title: "ESB Form Builder",
 });
 
-import { useThemePicker, primaryColors, neutralColors, colorMap } from "~/composables/useThemePicker";
+import {
+  useThemePicker,
+  primaryColors,
+  neutralColors,
+  colorMap,
+} from "~/composables/useThemePicker";
 const { appConfig, showThemePicker, setPrimary, setNeutral } = useThemePicker();
 const cards = [
   // {
@@ -200,7 +205,11 @@ const cards = [
           class="bg-white rounded-2xl shadow-xl border border-gray-100 p-3 w-56"
         >
           <!-- Primary -->
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-0.5">Primary</p>
+          <p
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-0.5"
+          >
+            Primary
+          </p>
           <div class="grid grid-cols-6 gap-1.5 mb-1">
             <button
               v-for="color in primaryColors"
@@ -218,15 +227,26 @@ const cards = [
             </button>
           </div>
           <div class="flex items-center gap-1.5 px-0.5 mb-3">
-            <div class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: colorMap[appConfig.ui.colors.primary] }" />
-            <span class="text-xs text-gray-400 capitalize">{{ appConfig.ui.colors.primary }}</span>
+            <div
+              class="w-2.5 h-2.5 rounded-full shrink-0"
+              :style="{
+                backgroundColor: colorMap[appConfig.ui.colors.primary],
+              }"
+            />
+            <span class="text-xs text-gray-400 capitalize">{{
+              appConfig.ui.colors.primary
+            }}</span>
           </div>
 
           <!-- Divider -->
           <div class="border-t border-gray-100 mb-3" />
 
           <!-- Neutral -->
-          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-0.5">Neutral</p>
+          <p
+            class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-0.5"
+          >
+            Neutral
+          </p>
           <div class="flex gap-1.5 mb-1">
             <button
               v-for="color in neutralColors"
@@ -244,8 +264,15 @@ const cards = [
             </button>
           </div>
           <div class="flex items-center gap-1.5 px-0.5">
-            <div class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: colorMap[appConfig.ui.colors.neutral] }" />
-            <span class="text-xs text-gray-400 capitalize">{{ appConfig.ui.colors.neutral }}</span>
+            <div
+              class="w-2.5 h-2.5 rounded-full shrink-0"
+              :style="{
+                backgroundColor: colorMap[appConfig.ui.colors.neutral],
+              }"
+            />
+            <span class="text-xs text-gray-400 capitalize">{{
+              appConfig.ui.colors.neutral
+            }}</span>
           </div>
         </div>
       </Transition>

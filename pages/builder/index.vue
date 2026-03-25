@@ -7,16 +7,22 @@ import { uid, newRow, newSection, newPage } from "~/utils/canvas-factories";
 import { useBuilderDragDrop } from "~/composables/useBuilderDragDrop";
 import {
   useFieldEditor,
-  ruleTypeOptions, ruleNeedsValue,
-  supportsValidation, supportsRequiredMessage,
-  hasItems, colTypeOptions, sectionStyleOptions, colSpanOptions,
-  ADDRESS_LEVELS, addressLevelLabels,
+  ruleTypeOptions,
+  ruleNeedsValue,
+  supportsValidation,
+  supportsRequiredMessage,
+  hasItems,
+  colTypeOptions,
+  sectionStyleOptions,
+  colSpanOptions,
+  ADDRESS_LEVELS,
+  addressLevelLabels,
 } from "~/composables/useFieldEditor";
 import { useFormPersistence } from "~/composables/useFormPersistence";
 
 definePageMeta({ title: "Form Builder" });
 
-// ── Core state 
+// ── Core state
 
 const modal = useConfirmModal();
 
@@ -31,14 +37,15 @@ const selectedId = ref<string | null>(null);
 const rightPanel = ref<"field" | "row" | "section" | "page" | null>(null);
 
 const currentPage = computed(() => pages.value[activePageIdx.value]);
-const currentSection = computed(() => currentPage.value?.sections[activeSectionIdx.value]);
+const currentSection = computed(
+  () => currentPage.value?.sections[activeSectionIdx.value],
+);
 
 const selectedField = computed(() => {
   for (const page of pages.value)
     for (const sec of page.sections)
       for (const row of sec.rows)
-        for (const f of row.fields)
-          if (f._id === selectedId.value) return f;
+        for (const f of row.fields) if (f._id === selectedId.value) return f;
   return null;
 });
 
@@ -60,7 +67,7 @@ function selectField(id: string) {
   rightPanel.value = "field";
 }
 
-// ── Page management 
+// ── Page management
 
 function addPage() {
   pages.value.push(newPage(`Step ${pages.value.length + 1}`));
@@ -80,7 +87,10 @@ function removePage(idx: number) {
     confirmLabel: "Remove",
     onConfirm: () => {
       pages.value.splice(idx, 1);
-      activePageIdx.value = Math.min(activePageIdx.value, pages.value.length - 1);
+      activePageIdx.value = Math.min(
+        activePageIdx.value,
+        pages.value.length - 1,
+      );
       activeSectionIdx.value = 0;
       selectedId.value = null;
     },
@@ -96,7 +106,11 @@ function setActivePage(idx: number) {
 
 function duplicatePage(pi: number) {
   const taken = new Set(
-    pages.value.flatMap((p) => p.sections.flatMap((s) => s.rows.flatMap((r) => r.fields.map((f) => f.name))))
+    pages.value.flatMap((p) =>
+      p.sections.flatMap((s) =>
+        s.rows.flatMap((r) => r.fields.map((f) => f.name)),
+      ),
+    ),
   );
   const page = pages.value[pi];
   const clone = {
@@ -109,7 +123,11 @@ function duplicatePage(pi: number) {
       rows: sec.rows.map((row) => ({
         ...row,
         _id: uid(),
-        fields: row.fields.map((f) => ({ ...f, _id: uid(), name: _uniqueName(f.name, taken) })),
+        fields: row.fields.map((f) => ({
+          ...f,
+          _id: uid(),
+          name: _uniqueName(f.name, taken),
+        })),
       })),
     })),
   };
@@ -120,10 +138,12 @@ function duplicatePage(pi: number) {
   rightPanel.value = "page";
 }
 
-// ── Section management 
+// ── Section management
 
 function addSection() {
-  currentPage.value.sections.push(newSection(`Section ${currentPage.value.sections.length + 1}`));
+  currentPage.value.sections.push(
+    newSection(`Section ${currentPage.value.sections.length + 1}`),
+  );
   activeSectionIdx.value = currentPage.value.sections.length - 1;
   selectedId.value = null;
   rightPanel.value = "section";
@@ -139,7 +159,10 @@ function removeSection(idx: number) {
     confirmLabel: "Remove",
     onConfirm: () => {
       currentPage.value.sections.splice(idx, 1);
-      activeSectionIdx.value = Math.min(activeSectionIdx.value, currentPage.value.sections.length - 1);
+      activeSectionIdx.value = Math.min(
+        activeSectionIdx.value,
+        currentPage.value.sections.length - 1,
+      );
       selectedId.value = null;
     },
   });
@@ -161,7 +184,11 @@ function _uniqueName(base: string, taken: Set<string>): string {
 
 function duplicateSection(si: number) {
   const taken = new Set(
-    pages.value.flatMap((p) => p.sections.flatMap((s) => s.rows.flatMap((r) => r.fields.map((f) => f.name))))
+    pages.value.flatMap((p) =>
+      p.sections.flatMap((s) =>
+        s.rows.flatMap((r) => r.fields.map((f) => f.name)),
+      ),
+    ),
   );
   const sec = currentPage.value.sections[si];
   const clone = {
@@ -171,7 +198,11 @@ function duplicateSection(si: number) {
     rows: sec.rows.map((row) => ({
       ...row,
       _id: uid(),
-      fields: row.fields.map((f) => ({ ...f, _id: uid(), name: _uniqueName(f.name, taken) })),
+      fields: row.fields.map((f) => ({
+        ...f,
+        _id: uid(),
+        name: _uniqueName(f.name, taken),
+      })),
     })),
   };
   currentPage.value.sections.splice(si + 1, 0, clone);
@@ -182,7 +213,11 @@ function duplicateSection(si: number) {
 
 function duplicateField(fieldId: string) {
   const taken = new Set(
-    pages.value.flatMap((p) => p.sections.flatMap((s) => s.rows.flatMap((r) => r.fields.map((f) => f.name))))
+    pages.value.flatMap((p) =>
+      p.sections.flatMap((s) =>
+        s.rows.flatMap((r) => r.fields.map((f) => f.name)),
+      ),
+    ),
   );
   for (const page of pages.value)
     for (const sec of page.sections)
@@ -190,7 +225,11 @@ function duplicateField(fieldId: string) {
         const idx = row.fields.findIndex((f) => f._id === fieldId);
         if (idx >= 0) {
           const src = row.fields[idx];
-          const clone = { ...src, _id: uid(), name: _uniqueName(src.name, taken) };
+          const clone = {
+            ...src,
+            _id: uid(),
+            name: _uniqueName(src.name, taken),
+          };
           row.fields.splice(idx + 1, 0, clone);
           selectedId.value = clone._id;
           rightPanel.value = "field";
@@ -222,7 +261,10 @@ function updateSelectedRow(patch: Partial<CanvasRow>) {
   for (const page of pages.value)
     for (const sec of page.sections) {
       const row = sec.rows.find((r) => r._id === selectedRowId.value);
-      if (row) { Object.assign(row, patch); return; }
+      if (row) {
+        Object.assign(row, patch);
+        return;
+      }
     }
 }
 
@@ -241,7 +283,10 @@ function removeRow(sectionId: string, rowId: string) {
   if (!row) return;
   const doRemove = () => {
     section.rows = section.rows.filter((r) => r._id !== rowId);
-    if (selectedRowId.value === rowId) { selectedRowId.value = null; rightPanel.value = null; }
+    if (selectedRowId.value === rowId) {
+      selectedRowId.value = null;
+      rightPanel.value = null;
+    }
   };
   if (row.fields.length > 0) {
     modal.openConfirm({
@@ -259,19 +304,45 @@ function removeRow(sectionId: string, rowId: string) {
 // ── Drag & drop ────
 
 const dnd = useBuilderDragDrop({
-  pages, currentPage, activePageIdx, activeSectionIdx, selectedId, rightPanel, uid,
+  pages,
+  currentPage,
+  activePageIdx,
+  activeSectionIdx,
+  selectedId,
+  rightPanel,
+  uid,
 });
 
 const {
-  draggingFrom, draggingCanvasId, dragOverSectionId, dragOverIndex,
-  draggingPageIdx, dragOverPageIdx,
-  onPageTabDragStart, onPageTabDragOver, onPageTabDrop, onPageTabDragEnd,
-  draggingSectionIdx, dragOverSectionTabIdx,
-  onSectionTabDragStart, onSectionTabDragOver, onSectionTabDrop, onSectionTabDragEnd,
-  draggingRowId, dragOverRowId,
-  onRowDragStart, onRowDragOver, onRowDrop, onRowDragEnd,
-  onPaletteDragStart, onCanvasDragStart, onDragOver, onDragLeave,
-  onDropToRow, onDropNewRow, onDrop,
+  draggingFrom,
+  draggingCanvasId,
+  dragOverSectionId,
+  dragOverIndex,
+  draggingPageIdx,
+  dragOverPageIdx,
+  onPageTabDragStart,
+  onPageTabDragOver,
+  onPageTabDrop,
+  onPageTabDragEnd,
+  draggingSectionIdx,
+  dragOverSectionTabIdx,
+  onSectionTabDragStart,
+  onSectionTabDragOver,
+  onSectionTabDrop,
+  onSectionTabDragEnd,
+  draggingRowId,
+  dragOverRowId,
+  onRowDragStart,
+  onRowDragOver,
+  onRowDrop,
+  onRowDragEnd,
+  onPaletteDragStart,
+  onCanvasDragStart,
+  onDragOver,
+  onDragLeave,
+  onDropToRow,
+  onDropNewRow,
+  onDrop,
 } = dnd;
 
 // ── Field editor ───
@@ -280,29 +351,69 @@ const {
   updateSelected,
   removeField,
   updateFullAddressSubField,
-  addRule, removeRule, updateRule,
-  getAddressRequiredMessage, setAddressRequiredMessage,
-  addItem, removeItem, updateItem,
-  addTableColumn, removeTableColumn, updateTableColumn,
-  addTableColOption, removeTableColOption, updateTableColOption,
-  addRepeaterField, removeRepeaterField, updateRepeaterField,
-  addRepeaterFieldOption, removeRepeaterFieldOption, updateRepeaterFieldOption,
+  addRule,
+  removeRule,
+  updateRule,
+  getAddressRequiredMessage,
+  setAddressRequiredMessage,
+  addItem,
+  removeItem,
+  updateItem,
+  addTableColumn,
+  removeTableColumn,
+  updateTableColumn,
+  addTableColOption,
+  removeTableColOption,
+  updateTableColOption,
+  addRepeaterField,
+  removeRepeaterField,
+  updateRepeaterField,
+  addRepeaterFieldOption,
+  removeRepeaterFieldOption,
+  updateRepeaterFieldOption,
 } = useFieldEditor({ pages, selectedId, selectedField, rightPanel, modal });
 
 // ── Persistence ────
 
 const {
-  savedForms, refresh, deleteForm,
-  showPreview, showLoad, previewConfig, previewKey,
-  save, loadSaved, exportJson, openPreview,
-} = useFormPersistence({ pages, formTitle, formId, serviceCode, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel });
+  savedForms,
+  refresh,
+  deleteForm,
+  showPreview,
+  showLoad,
+  previewConfig,
+  previewKey,
+  save,
+  loadSaved,
+  exportJson,
+  openPreview,
+} = useFormPersistence({
+  pages,
+  formTitle,
+  formId,
+  serviceCode,
+  isMultiStep,
+  activePageIdx,
+  activeSectionIdx,
+  selectedId,
+  rightPanel,
+});
 
 // ── WYSIWYG canvas helpers ──
 
 const COL_SPAN_CLASS: Record<number, string> = {
-  1: "col-span-1", 2: "col-span-2", 3: "col-span-3", 4: "col-span-4",
-  5: "col-span-5", 6: "col-span-6", 7: "col-span-7", 8: "col-span-8",
-  9: "col-span-9", 10: "col-span-10", 11: "col-span-11", 12: "col-span-12",
+  1: "col-span-1",
+  2: "col-span-2",
+  3: "col-span-3",
+  4: "col-span-4",
+  5: "col-span-5",
+  6: "col-span-6",
+  7: "col-span-7",
+  8: "col-span-8",
+  9: "col-span-9",
+  10: "col-span-10",
+  11: "col-span-11",
+  12: "col-span-12",
 };
 </script>
 
@@ -564,12 +675,20 @@ const COL_SPAN_CLASS: Record<number, string> = {
                 <div
                   v-if="!currentSection?.rows.length"
                   class="border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center py-40 text-center"
-                  @dragover.prevent="dragOverSectionId = currentSection?._id ?? null; dragOverIndex = 0"
+                  @dragover.prevent="
+                    dragOverSectionId = currentSection?._id ?? null;
+                    dragOverIndex = 0;
+                  "
                   @dragleave="onDragLeave"
                   @drop.prevent="onDrop(currentSection!._id, 0, $event)"
                 >
-                  <UIcon name="i-heroicons-cursor-arrow-rays" class="size-8 text-gray-300 mb-2" />
-                  <p class="text-sm text-gray-400">Drag fields here to create a row</p>
+                  <UIcon
+                    name="i-heroicons-cursor-arrow-rays"
+                    class="size-8 text-gray-300 mb-2"
+                  />
+                  <p class="text-sm text-gray-400">
+                    Drag fields here to create a row
+                  </p>
                 </div>
 
                 <!-- Rows -->
@@ -577,20 +696,35 @@ const COL_SPAN_CLASS: Record<number, string> = {
                   <!-- Before-first-row drop zone -->
                   <div
                     class="h-1.5 rounded-full transition-colors"
-                    :class="dragOverSectionId === currentSection?._id && dragOverIndex === 0 ? 'bg-primary-400' : 'bg-transparent'"
-                    @dragover.prevent="dragOverSectionId = currentSection!._id; dragOverIndex = 0"
+                    :class="
+                      dragOverSectionId === currentSection?._id &&
+                      dragOverIndex === 0
+                        ? 'bg-primary-400'
+                        : 'bg-transparent'
+                    "
+                    @dragover.prevent="
+                      dragOverSectionId = currentSection!._id;
+                      dragOverIndex = 0;
+                    "
                     @dragleave="onDragLeave"
                     @drop.prevent="onDropNewRow(currentSection!._id, 0, $event)"
                   />
 
-                  <template v-for="(row, ri) in currentSection?.rows ?? []" :key="row._id">
+                  <template
+                    v-for="(row, ri) in currentSection?.rows ?? []"
+                    :key="row._id"
+                  >
                     <!-- Row block -->
                     <div
                       class="border rounded-xl overflow-hidden transition-all"
                       :class="[
-                        selectedRowId === row._id ? 'border-primary-300 bg-primary-50/20' : 'border-gray-200 bg-gray-50/30',
+                        selectedRowId === row._id
+                          ? 'border-primary-300 bg-primary-50/20'
+                          : 'border-gray-200 bg-gray-50/30',
                         draggingRowId === row._id ? 'opacity-40' : '',
-                        dragOverRowId === row._id && draggingRowId !== row._id ? 'ring-2 ring-primary-400' : '',
+                        dragOverRowId === row._id && draggingRowId !== row._id
+                          ? 'ring-2 ring-primary-400'
+                          : '',
                       ]"
                       @dragover.prevent="onRowDragOver(row._id, $event)"
                       @dragleave="dragOverRowId = null"
@@ -601,16 +735,38 @@ const COL_SPAN_CLASS: Record<number, string> = {
                         class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 bg-white/70 cursor-pointer select-none group"
                         draggable="true"
                         @click.stop="selectRow(row._id)"
-                        @dragstart="onRowDragStart(row._id, currentSection!._id, $event)"
+                        @dragstart="
+                          onRowDragStart(row._id, currentSection!._id, $event)
+                        "
                         @dragend="onRowDragEnd"
                       >
-                        <UIcon name="i-heroicons-bars-2" class="size-4 text-gray-300 shrink-0 cursor-grab" />
-                        <UBadge size="xs" :color="row.layout === 'auto' ? 'neutral' : 'primary'" variant="subtle">
-                          {{ row.layout === 'auto' ? 'Auto' : row.layout === 'flex' ? 'Flex' : `Grid ${row.cols ?? 2}` }}
+                        <UIcon
+                          name="i-heroicons-bars-2"
+                          class="size-4 text-gray-300 shrink-0 cursor-grab"
+                        />
+                        <UBadge
+                          size="xs"
+                          :color="row.layout === 'auto' ? 'neutral' : 'primary'"
+                          variant="subtle"
+                        >
+                          {{
+                            row.layout === "auto"
+                              ? "Auto"
+                              : row.layout === "flex"
+                                ? "Flex"
+                                : `Grid ${row.cols ?? 2}`
+                          }}
                         </UBadge>
-                        <span class="text-xs text-gray-400 flex-1">{{ row.fields.length }} field{{ row.fields.length !== 1 ? 's' : '' }}</span>
+                        <span class="text-xs text-gray-400 flex-1"
+                          >{{ row.fields.length }} field{{
+                            row.fields.length !== 1 ? "s" : ""
+                          }}</span
+                        >
                         <UButton
-                          size="xs" variant="ghost" color="error" icon="i-heroicons-trash"
+                          size="xs"
+                          variant="ghost"
+                          color="error"
+                          icon="i-heroicons-trash"
                           class="opacity-0 group-hover:opacity-100 transition-opacity"
                           @click.stop="removeRow(currentSection!._id, row._id)"
                         />
@@ -619,9 +775,24 @@ const COL_SPAN_CLASS: Record<number, string> = {
                       <!-- Fields inside row — WYSIWYG grid -->
                       <div
                         class="p-2 grid grid-cols-12 gap-2 min-h-10"
-                        @dragover.prevent="dragOverSectionId = currentSection!._id; dragOverIndex = row.fields.length; dragOverRowId = row._id"
-                        @dragleave="dragOverSectionId = null; dragOverIndex = null; dragOverRowId = null"
-                        @drop.prevent="onDropToRow(currentSection!._id, row._id, row.fields.length, $event)"
+                        @dragover.prevent="
+                          dragOverSectionId = currentSection!._id;
+                          dragOverIndex = row.fields.length;
+                          dragOverRowId = row._id;
+                        "
+                        @dragleave="
+                          dragOverSectionId = null;
+                          dragOverIndex = null;
+                          dragOverRowId = null;
+                        "
+                        @drop.prevent="
+                          onDropToRow(
+                            currentSection!._id,
+                            row._id,
+                            row.fields.length,
+                            $event,
+                          )
+                        "
                       >
                         <div
                           v-for="(field, fi) in row.fields"
@@ -629,104 +800,270 @@ const COL_SPAN_CLASS: Record<number, string> = {
                           class="relative group/field"
                           :class="COL_SPAN_CLASS[field.colSpan ?? 12]"
                           draggable="true"
-                          @dragstart="onCanvasDragStart(field._id, currentSection!._id, $event)"
-                          @dragover.prevent.stop="dragOverSectionId = currentSection!._id; dragOverIndex = fi; dragOverRowId = row._id"
-                          @drop.prevent.stop="onDropToRow(currentSection!._id, row._id, fi, $event)"
+                          @dragstart="
+                            onCanvasDragStart(
+                              field._id,
+                              currentSection!._id,
+                              $event,
+                            )
+                          "
+                          @dragover.prevent.stop="
+                            dragOverSectionId = currentSection!._id;
+                            dragOverIndex = fi;
+                            dragOverRowId = row._id;
+                          "
+                          @drop.prevent.stop="
+                            onDropToRow(
+                              currentSection!._id,
+                              row._id,
+                              fi,
+                              $event,
+                            )
+                          "
                         >
                           <!-- WYSIWYG field card -->
                           <div
                             class="h-full border rounded-xl overflow-hidden cursor-pointer transition-all select-none"
-                            :class="selectedId === field._id
-                              ? 'border-primary-400 shadow-sm ring-1 ring-primary-200'
-                              : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
+                            :class="
+                              selectedId === field._id
+                                ? 'border-primary-400 shadow-sm ring-1 ring-primary-200'
+                                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                            "
                             @click.stop="selectField(field._id)"
                           >
                             <!-- Card toolbar -->
-                            <div class="flex items-center justify-between px-2.5 py-1 border-b bg-gray-50 border-gray-100">
+                            <div
+                              class="flex items-center justify-between px-2.5 py-1 border-b bg-gray-50 border-gray-100"
+                            >
                               <div class="flex items-center gap-1.5 min-w-0">
-                                <UIcon name="i-heroicons-bars-2" class="size-3.5 text-gray-300 shrink-0 cursor-grab" />
-                                <span class="text-xs text-gray-400 font-mono truncate">{{ field.component }}</span>
-                                <UBadge v-if="field._group" color="primary" variant="subtle" size="xs">{{ field._group }}</UBadge>
-                                <UBadge v-if="duplicateNames.has(field.name)" color="warning" variant="subtle" size="xs">dup</UBadge>
+                                <UIcon
+                                  name="i-heroicons-bars-2"
+                                  class="size-3.5 text-gray-300 shrink-0 cursor-grab"
+                                />
+                                <span
+                                  class="text-xs text-gray-400 font-mono truncate"
+                                  >{{ field.component }}</span
+                                >
+                                <UBadge
+                                  v-if="field._group"
+                                  color="primary"
+                                  variant="subtle"
+                                  size="xs"
+                                  >{{ field._group }}</UBadge
+                                >
+                                <UBadge
+                                  v-if="duplicateNames.has(field.name)"
+                                  color="warning"
+                                  variant="subtle"
+                                  size="xs"
+                                  >dup</UBadge
+                                >
                               </div>
                               <div class="flex items-center gap-1 shrink-0">
-                                <span class="text-xs text-gray-300 font-mono">{{ field.colSpan ?? 12 }}/12</span>
-                                <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-document-duplicate"
+                                <span class="text-xs text-gray-300 font-mono"
+                                  >{{ field.colSpan ?? 12 }}/12</span
+                                >
+                                <UButton
+                                  size="xs"
+                                  variant="ghost"
+                                  color="neutral"
+                                  icon="i-heroicons-document-duplicate"
                                   class="opacity-0 group-hover/field:opacity-100 transition-opacity"
-                                  @click.stop="duplicateField(field._id)" />
-                                <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-trash"
+                                  @click.stop="duplicateField(field._id)"
+                                />
+                                <UButton
+                                  size="xs"
+                                  variant="ghost"
+                                  color="error"
+                                  icon="i-heroicons-trash"
                                   class="opacity-0 group-hover/field:opacity-100 transition-opacity"
-                                  @click.stop="removeField(field._id)" />
+                                  @click.stop="removeField(field._id)"
+                                />
                               </div>
                             </div>
 
                             <!-- Label + mock input -->
-                            <div class="px-3 py-2.5 space-y-1.5" :class="selectedId === field._id ? 'bg-primary-50' : 'bg-white'">
+                            <div
+                              class="px-3 py-2.5 space-y-1.5"
+                              :class="
+                                selectedId === field._id
+                                  ? 'bg-primary-50'
+                                  : 'bg-white'
+                              "
+                            >
                               <div class="flex items-center gap-1">
-                                <span class="text-sm text-gray-700 leading-snug">{{ field.label || field.name }}</span>
-                                <span v-if="field.required" class="text-red-500 text-sm leading-none">*</span>
+                                <span
+                                  class="text-sm text-gray-700 leading-snug"
+                                  >{{ field.label || field.name }}</span
+                                >
+                                <span
+                                  v-if="field.required"
+                                  class="text-red-500 text-sm leading-none"
+                                  >*</span
+                                >
                               </div>
 
                               <!-- Text / Number / Textarea / AsyncSelect / Address / Calendar -->
                               <div
-                                v-if="['UInput','UTextarea','UAsyncSelect','UAddress','UCalendar','UTagInput','UOtpInput','UDateRange'].includes(field.component)"
+                                v-if="
+                                  [
+                                    'UInput',
+                                    'UTextarea',
+                                    'UAsyncSelect',
+                                    'UAddress',
+                                    'UCalendar',
+                                    'UTagInput',
+                                    'UOtpInput',
+                                    'UDateRange',
+                                  ].includes(field.component)
+                                "
                                 class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2"
                               >
-                                <span class="text-xs text-gray-300 truncate flex-1">{{ field.placeholder || "" }}</span>
-                                <UIcon v-if="field.component === 'UCalendar' || field.component === 'UDateRange'" name="i-heroicons-calendar-days" class="size-3.5 text-gray-300 shrink-0" />
-                                <UIcon v-else-if="['UAddress','UAsyncSelect'].includes(field.component)" name="i-heroicons-magnifying-glass" class="size-3.5 text-gray-300 shrink-0" />
+                                <span
+                                  class="text-xs text-gray-300 truncate flex-1"
+                                  >{{ field.placeholder || "" }}</span
+                                >
+                                <UIcon
+                                  v-if="
+                                    field.component === 'UCalendar' ||
+                                    field.component === 'UDateRange'
+                                  "
+                                  name="i-heroicons-calendar-days"
+                                  class="size-3.5 text-gray-300 shrink-0"
+                                />
+                                <UIcon
+                                  v-else-if="
+                                    ['UAddress', 'UAsyncSelect'].includes(
+                                      field.component,
+                                    )
+                                  "
+                                  name="i-heroicons-magnifying-glass"
+                                  class="size-3.5 text-gray-300 shrink-0"
+                                />
                               </div>
 
                               <!-- Select / SelectMenu -->
                               <div
-                                v-else-if="['USelect','USelectMenu'].includes(field.component)"
+                                v-else-if="
+                                  ['USelect', 'USelectMenu'].includes(
+                                    field.component,
+                                  )
+                                "
                                 class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 justify-between"
                               >
-                                <span class="text-xs text-gray-300">{{ field.placeholder || "" }}</span>
-                                <UIcon name="i-heroicons-chevron-up-down" class="size-3.5 text-gray-300" />
+                                <span class="text-xs text-gray-300">{{
+                                  field.placeholder || ""
+                                }}</span>
+                                <UIcon
+                                  name="i-heroicons-chevron-up-down"
+                                  class="size-3.5 text-gray-300"
+                                />
                               </div>
 
                               <!-- Radio -->
-                              <div v-else-if="field.component === 'URadioGroup'" class="flex items-center gap-3 py-0.5 flex-wrap">
-                                <div v-for="item in (field.items ?? []).slice(0, 3)" :key="item.value" class="flex items-center gap-1">
-                                  <div class="size-3 rounded-full border border-gray-300 bg-white shrink-0" />
-                                  <span class="text-xs text-gray-400">{{ item.label }}</span>
+                              <div
+                                v-else-if="field.component === 'URadioGroup'"
+                                class="flex items-center gap-3 py-0.5 flex-wrap"
+                              >
+                                <div
+                                  v-for="item in (field.items ?? []).slice(
+                                    0,
+                                    3,
+                                  )"
+                                  :key="item.value"
+                                  class="flex items-center gap-1"
+                                >
+                                  <div
+                                    class="size-3 rounded-full border border-gray-300 bg-white shrink-0"
+                                  />
+                                  <span class="text-xs text-gray-400">{{
+                                    item.label
+                                  }}</span>
                                 </div>
-                                <span v-if="!(field.items?.length)" class="text-xs text-gray-300 italic">No options</span>
+                                <span
+                                  v-if="!field.items?.length"
+                                  class="text-xs text-gray-300 italic"
+                                  >No options</span
+                                >
                               </div>
 
                               <!-- Checkbox -->
-                              <div v-else-if="field.component === 'UCheckboxGroup'" class="flex items-center gap-3 py-0.5 flex-wrap">
-                                <div v-for="item in (field.items ?? []).slice(0, 3)" :key="item.value" class="flex items-center gap-1">
-                                  <div class="size-3 rounded border border-gray-300 bg-white shrink-0" />
-                                  <span class="text-xs text-gray-400">{{ item.label }}</span>
+                              <div
+                                v-else-if="field.component === 'UCheckboxGroup'"
+                                class="flex items-center gap-3 py-0.5 flex-wrap"
+                              >
+                                <div
+                                  v-for="item in (field.items ?? []).slice(
+                                    0,
+                                    3,
+                                  )"
+                                  :key="item.value"
+                                  class="flex items-center gap-1"
+                                >
+                                  <div
+                                    class="size-3 rounded border border-gray-300 bg-white shrink-0"
+                                  />
+                                  <span class="text-xs text-gray-400">{{
+                                    item.label
+                                  }}</span>
                                 </div>
-                                <span v-if="!(field.items?.length)" class="text-xs text-gray-300 italic">No options</span>
+                                <span
+                                  v-if="!field.items?.length"
+                                  class="text-xs text-gray-300 italic"
+                                  >No options</span
+                                >
                               </div>
 
                               <!-- Switch -->
-                              <div v-else-if="field.component === 'USwitch'" class="flex items-center gap-2 py-0.5">
-                                <div class="w-8 h-4 rounded-full bg-gray-200 flex items-center px-0.5">
-                                  <div class="size-3 rounded-full bg-white shadow-sm" />
+                              <div
+                                v-else-if="field.component === 'USwitch'"
+                                class="flex items-center gap-2 py-0.5"
+                              >
+                                <div
+                                  class="w-8 h-4 rounded-full bg-gray-200 flex items-center px-0.5"
+                                >
+                                  <div
+                                    class="size-3 rounded-full bg-white shadow-sm"
+                                  />
                                 </div>
                               </div>
 
                               <!-- File -->
                               <div
-                                v-else-if="['UFileInput','UFileUpload'].includes(field.component)"
+                                v-else-if="
+                                  ['UFileInput', 'UFileUpload'].includes(
+                                    field.component,
+                                  )
+                                "
                                 class="h-8 border-2 border-dashed border-gray-200 rounded-md bg-white flex items-center justify-center gap-1.5"
                               >
-                                <UIcon name="i-heroicons-paper-clip" class="size-3.5 text-gray-300" />
-                                <span class="text-xs text-gray-300">Upload file</span>
+                                <UIcon
+                                  name="i-heroicons-paper-clip"
+                                  class="size-3.5 text-gray-300"
+                                />
+                                <span class="text-xs text-gray-300"
+                                  >Upload file</span
+                                >
                               </div>
 
                               <!-- Table / Repeater -->
                               <div
-                                v-else-if="['UTableField','URepeater'].includes(field.component)"
+                                v-else-if="
+                                  ['UTableField', 'URepeater'].includes(
+                                    field.component,
+                                  )
+                                "
                                 class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2"
                               >
-                                <UIcon name="i-heroicons-table-cells" class="size-3.5 text-gray-300 shrink-0" />
-                                <span class="text-xs text-gray-300">{{ field.component === 'UTableField' ? 'Table' : 'Repeater' }}</span>
+                                <UIcon
+                                  name="i-heroicons-table-cells"
+                                  class="size-3.5 text-gray-300 shrink-0"
+                                />
+                                <span class="text-xs text-gray-300">{{
+                                  field.component === "UTableField"
+                                    ? "Table"
+                                    : "Repeater"
+                                }}</span>
                               </div>
 
                               <!-- Map Picker -->
@@ -734,9 +1071,18 @@ const COL_SPAN_CLASS: Record<number, string> = {
                                 v-else-if="field.component === 'UMapPicker'"
                                 class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2"
                               >
-                                <UIcon name="i-heroicons-map-pin" class="size-3.5 text-gray-300 shrink-0" />
-                                <span class="text-xs text-gray-300 flex-1 truncate">No location selected</span>
-                                <UIcon name="i-heroicons-map" class="size-3.5 text-gray-300 shrink-0" />
+                                <UIcon
+                                  name="i-heroicons-map-pin"
+                                  class="size-3.5 text-gray-300 shrink-0"
+                                />
+                                <span
+                                  class="text-xs text-gray-300 flex-1 truncate"
+                                  >No location selected</span
+                                >
+                                <UIcon
+                                  name="i-heroicons-map"
+                                  class="size-3.5 text-gray-300 shrink-0"
+                                />
                               </div>
                             </div>
                           </div>
@@ -747,18 +1093,36 @@ const COL_SPAN_CLASS: Record<number, string> = {
                     <!-- Between-rows drop zone -->
                     <div
                       class="h-1.5 rounded-full transition-colors"
-                      :class="dragOverSectionId === currentSection?._id && dragOverIndex === ri + 1 && !dragOverRowId ? 'bg-primary-400' : 'bg-transparent'"
-                      @dragover.prevent="dragOverSectionId = currentSection!._id; dragOverIndex = ri + 1; dragOverRowId = null"
+                      :class="
+                        dragOverSectionId === currentSection?._id &&
+                        dragOverIndex === ri + 1 &&
+                        !dragOverRowId
+                          ? 'bg-primary-400'
+                          : 'bg-transparent'
+                      "
+                      @dragover.prevent="
+                        dragOverSectionId = currentSection!._id;
+                        dragOverIndex = ri + 1;
+                        dragOverRowId = null;
+                      "
                       @dragleave="onDragLeave"
-                      @drop.prevent="onDropNewRow(currentSection!._id, ri + 1, $event)"
+                      @drop.prevent="
+                        onDropNewRow(currentSection!._id, ri + 1, $event)
+                      "
                     />
                   </template>
 
                   <!-- Add Row button -->
                   <div class="pt-1">
-                    <UButton size="xs" variant="ghost" color="neutral" leading-icon="i-heroicons-plus" @click="addRow(currentSection!._id)">
+                    <UButton
+                      size="xs"
+                      variant="ghost"
+                      color="neutral"
+                      leading-icon="i-heroicons-plus"
+                      @click="addRow(currentSection!._id)"
+                    >
                       <!-- Add Row -->
-                       Add Container
+                      Add Container
                     </UButton>
                   </div>
                 </template>
@@ -1192,7 +1556,13 @@ const COL_SPAN_CLASS: Record<number, string> = {
                           color="error"
                           icon="i-heroicons-x-mark"
                           type="button"
-                          @click="removeTableColOption(selectedField, Number(ci), Number(oi))"
+                          @click="
+                            removeTableColOption(
+                              selectedField,
+                              Number(ci),
+                              Number(oi),
+                            )
+                          "
                         />
                       </div>
                       <UButton
@@ -1348,7 +1718,11 @@ const COL_SPAN_CLASS: Record<number, string> = {
                           icon="i-heroicons-x-mark"
                           type="button"
                           @click="
-                            removeRepeaterFieldOption(selectedField, Number(ci), Number(oi))
+                            removeRepeaterFieldOption(
+                              selectedField,
+                              Number(ci),
+                              Number(oi),
+                            )
                           "
                         />
                       </div>
@@ -1357,7 +1731,9 @@ const COL_SPAN_CLASS: Record<number, string> = {
                         variant="ghost"
                         leading-icon="i-heroicons-plus"
                         type="button"
-                        @click="addRepeaterFieldOption(selectedField, Number(ci))"
+                        @click="
+                          addRepeaterFieldOption(selectedField, Number(ci))
+                        "
                         >Option</UButton
                       >
                     </div>

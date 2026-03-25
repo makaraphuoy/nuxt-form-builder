@@ -1,6 +1,6 @@
 import type { JSONField } from "~/utils/form-schema";
 
-// ─── Canvas types 
+// ─── Canvas types
 
 export interface CanvasField extends JSONField {
   _id: string;
@@ -174,7 +174,7 @@ export const palette: PaletteItem[] = [
   },
 ];
 
-// ─── Field factory 
+// ─── Field factory
 
 export function makeField(
   item: PaletteItem,

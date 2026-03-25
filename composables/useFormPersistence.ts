@@ -17,9 +17,20 @@ export function useFormPersistence(params: {
   selectedId: Ref<string | null>;
   rightPanel: Ref<"field" | "row" | "section" | "page" | null>;
 }) {
-  const { pages, formTitle, formId, serviceCode, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel } = params;
+  const {
+    pages,
+    formTitle,
+    formId,
+    serviceCode,
+    isMultiStep,
+    activePageIdx,
+    activeSectionIdx,
+    selectedId,
+    rightPanel,
+  } = params;
 
-  const { savedForms, saveForm, loadForm, deleteForm, refresh } = useFormStorage();
+  const { savedForms, saveForm, loadForm, deleteForm, refresh } =
+    useFormStorage();
   const toast = useToast();
   const route = useRoute();
 
@@ -29,9 +40,22 @@ export function useFormPersistence(params: {
   const previewKey = ref(0);
 
   function save() {
-    saveForm(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value, serviceCode.value || undefined), formTitle.value);
+    saveForm(
+      buildConfig(
+        pages.value,
+        formId.value,
+        formTitle.value,
+        isMultiStep.value,
+        serviceCode.value || undefined,
+      ),
+      formTitle.value,
+    );
     refresh();
-    toast.add({ title: "Saved!", color: "success", icon: "i-heroicons-check-circle" });
+    toast.add({
+      title: "Saved!",
+      color: "success",
+      icon: "i-heroicons-check-circle",
+    });
   }
 
   function loadSaved(id: string) {
@@ -59,15 +83,41 @@ export function useFormPersistence(params: {
                   layout: jr.layout ?? "auto",
                   cols: jr.cols,
                   gap: jr.gap ?? "md",
-                  fields: jr.fields.map((f: any) => ({ ...f, _id: uid() }) as CanvasField),
+                  fields: jr.fields.map(
+                    (f: any) => ({ ...f, _id: uid() }) as CanvasField,
+                  ),
                 }))
               : js.fields?.length
-              ? [{ _id: uid(), layout: "auto", gap: "md", fields: js.fields.map((f: any) => ({ ...f, _id: uid() }) as CanvasField) }]
-              : [],
+                ? [
+                    {
+                      _id: uid(),
+                      layout: "auto",
+                      gap: "md",
+                      fields: js.fields.map(
+                        (f: any) => ({ ...f, _id: uid() }) as CanvasField,
+                      ),
+                    },
+                  ]
+                : [],
           }))
-        : [{ _id: uid(), title: "Section 1", rows: jp.fields?.length
-              ? [{ _id: uid(), layout: "auto", gap: "md", fields: (jp.fields ?? []).map((f: any) => ({ ...f, _id: uid() }) as CanvasField) }]
-              : [] }],
+        : [
+            {
+              _id: uid(),
+              title: "Section 1",
+              rows: jp.fields?.length
+                ? [
+                    {
+                      _id: uid(),
+                      layout: "auto",
+                      gap: "md",
+                      fields: (jp.fields ?? []).map(
+                        (f: any) => ({ ...f, _id: uid() }) as CanvasField,
+                      ),
+                    },
+                  ]
+                : [],
+            },
+          ],
     }));
 
     activePageIdx.value = 0;
@@ -78,7 +128,17 @@ export function useFormPersistence(params: {
   }
 
   function exportJson() {
-    const json = JSON.stringify(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value, serviceCode.value || undefined), null, 2);
+    const json = JSON.stringify(
+      buildConfig(
+        pages.value,
+        formId.value,
+        formTitle.value,
+        isMultiStep.value,
+        serviceCode.value || undefined,
+      ),
+      null,
+      2,
+    );
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -89,7 +149,15 @@ export function useFormPersistence(params: {
   }
 
   function openPreview() {
-    previewConfig.value = interpretConfig(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value, serviceCode.value || undefined));
+    previewConfig.value = interpretConfig(
+      buildConfig(
+        pages.value,
+        formId.value,
+        formTitle.value,
+        isMultiStep.value,
+        serviceCode.value || undefined,
+      ),
+    );
     previewKey.value++;
     showPreview.value = true;
   }
