@@ -21,6 +21,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue";
+import { useFormBuilderFetch } from "~/composables/useFormBuilderFetch";
 
 interface Props {
   field: any;
@@ -42,9 +43,10 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
-  apiBaseUrl: "/api/address",
   formValues: () => ({}),
 });
+
+const { apiFetch } = useFormBuilderFetch();
 
 const emit = defineEmits<Emits>();
 
@@ -129,13 +131,7 @@ async function fetchOptions(skipCache = false) {
 
   try {
     const url = buildApiUrl();
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
+    const data = await apiFetch<any>(url);
     const labelKey = props.field.props?.labelKey || "name_kh";
     const valueKey = props.field.props?.valueKey || "code";
 

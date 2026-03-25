@@ -24,16 +24,6 @@ function getComponent(field: FieldWithConditions) {
   return field.component;
 }
 
-function onFileChange(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const files = target.files;
-  if (!files || files.length === 0) {
-    value.value = null;
-    return;
-  }
-  const allowMultiple = props.field.props?.multiple ?? false;
-  value.value = allowMultiple ? Array.from(files) : files[0];
-}
 
 function fieldProps() {
   const computedItems = props.options?.length ? props.options : undefined;
@@ -57,15 +47,6 @@ function fieldProps() {
       v-if="field.component === 'UCalendar'"
       :field="field"
       :model-value="value"
-      @update:model-value="value = $event"
-    />
-
-    <!-- full address group -->
-    <BaseFullAddress
-      v-else-if="field.component === 'UFullAddress'"
-      :field="field"
-      :model-value="value"
-      :disabled="disabled"
       @update:model-value="value = $event"
     />
 
@@ -149,23 +130,23 @@ function fieldProps() {
       @update:model-value="value = $event"
     />
 
-    <!-- image / avatar upload -->
-    <UFileUpload
+    <!-- image / avatar upload — auto-uploads and shows thumbnail -->
+    <BaseAvatarUpload
       v-else-if="field.component === 'UFileUpload'"
       :model-value="value"
-      v-bind="{ accept: 'image/*', ...field.props, ...field.attrs }"
+      :accept="field.props?.accept ?? 'image/*'"
       :disabled="disabled"
       @update:model-value="value = $event"
     />
 
-    <!-- file input -->
-    <input
+    <!-- file attachment — uploads and shows filename card with actions -->
+    <BaseFileAttachment
       v-else-if="field.component === 'UFileInput'"
-      type="file"
-      v-bind="{ ...field.props, ...field.attrs }"
+      :model-value="value"
+      :accept="field.props?.accept ?? '*/*'"
+      :multiple="field.props?.multiple ?? false"
       :disabled="disabled"
-      class="block w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-      @change="onFileChange"
+      @update:model-value="value = $event"
     />
 
     <!-- SelectMenu — must use value-key so v-model holds the string value, not the full option object -->

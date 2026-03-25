@@ -57,18 +57,6 @@ export const colSpanOptions = [
   { label: "Quarter (3)", value: 3 },
 ];
 
-export const ADDRESS_LEVELS = [
-  "province",
-  "district",
-  "commune",
-  "village",
-] as const;
-export const addressLevelLabels: Record<string, string> = {
-  province: "Province (ខេត្ត/ក្រុង)",
-  district: "District (ស្រុក/ក្រុង)",
-  commune: "Commune (ឃុំ/សង្កាត់)",
-  village: "Village (ភូមិ)",
-};
 
 //  Composable ─
 
@@ -95,50 +83,53 @@ export function useFieldEditor(params: {
   }
 
   function removeField(id: string) {
-    let field: CanvasField | undefined = selectedField.value ?? undefined;
+    // Find the target field
+    let field: CanvasField | undefined = selectedField.value?._id === id
+      ? selectedField.value
+      : undefined;
     if (!field) {
       outer: for (const page of pages.value)
         for (const sec of page.sections)
           for (const row of sec.rows)
             for (const f of row.fields)
-              if (f._id === id) {
-                field = f;
-                break outer;
-              }
+              if (f._id === id) { field = f; break outer; }
     }
+
+    const groupId = field?._group;
+
+    // Collect all IDs to remove (single field, or whole group)
+    const idsToRemove = new Set<string>();
+    if (groupId) {
+      for (const page of pages.value)
+        for (const sec of page.sections)
+          for (const row of sec.rows)
+            for (const f of row.fields)
+              if (f._group === groupId) idsToRemove.add(f._id);
+    } else {
+      idsToRemove.add(id);
+    }
+
+    const label = groupId
+      ? "Full Address group (all 4 levels)"
+      : `"${field?.label || field?.name || "This field"}"`;
+
     modal.openConfirm({
       title: "Remove Field",
-      description: `"${field?.label || field?.name || "This field"}" will be removed.`,
+      description: `${label} will be removed.`,
       icon: "i-heroicons-trash",
       confirmLabel: "Remove",
       onConfirm: () => {
         for (const page of pages.value)
           for (const sec of page.sections)
-            for (const row of sec.rows) {
-              const idx = row.fields.findIndex((f) => f._id === id);
-              if (idx >= 0) {
-                row.fields.splice(idx, 1);
-                break;
-              }
-            }
-        if (selectedId.value === id) {
+            for (const row of sec.rows)
+              row.fields = row.fields.filter((f) => !idsToRemove.has(f._id));
+
+        if (selectedId.value && idsToRemove.has(selectedId.value)) {
           selectedId.value = null;
           rightPanel.value = null;
         }
       },
     });
-  }
-
-  //  Full Address sub-field
-
-  function updateFullAddressSubField(
-    field: CanvasField,
-    level: string,
-    patch: Record<string, any>,
-  ) {
-    const subFields = { ...(field.props?.subFields ?? {}) };
-    subFields[level] = { ...(subFields[level] ?? {}), ...patch };
-    updateSelected({ props: { ...field.props, subFields } });
   }
 
   //  Validation rules
@@ -319,7 +310,6 @@ export function useFieldEditor(params: {
   return {
     updateSelected,
     removeField,
-    updateFullAddressSubField,
     addRule,
     removeRule,
     updateRule,

@@ -15,8 +15,6 @@ import {
   colTypeOptions,
   sectionStyleOptions,
   colSpanOptions,
-  ADDRESS_LEVELS,
-  addressLevelLabels,
 } from "~/composables/useFieldEditor";
 import { useFormPersistence } from "~/composables/useFormPersistence";
 
@@ -27,7 +25,7 @@ definePageMeta({ title: "Form Builder" });
 const modal = useConfirmModal();
 
 const isMultiStep = ref(false);
-const formTitle = ref("My Form");
+const formTitle = ref("ចុះបញ្ជីពាណិជ្ជកម្ម");
 const formId = ref(`form-${Date.now()}`);
 const serviceCode = ref("");
 const pages = ref<CanvasPage[]>([newPage("Step 1")]);
@@ -350,7 +348,6 @@ const {
 const {
   updateSelected,
   removeField,
-  updateFullAddressSubField,
   addRule,
   removeRule,
   updateRule,
@@ -1148,19 +1145,6 @@ const COL_SPAN_CLASS: Record<number, string> = {
             Field Config
           </p>
 
-          <div
-            v-if="selectedField.component === 'UFullAddress'"
-            class="flex items-start gap-2 rounded-lg bg-primary-50 border border-primary-200 px-3 py-2.5 text-xs text-primary-700"
-          >
-            <UIcon name="i-heroicons-map-pin" class="size-4 shrink-0 mt-0.5" />
-            <div>
-              <p class="font-medium">Full Address Field</p>
-              <p class="text-primary-500 mt-0.5">
-                Configure each address level individually below.
-              </p>
-            </div>
-          </div>
-
           <UFormField label="Label">
             <UInput
               :model-value="selectedField.label"
@@ -1204,10 +1188,7 @@ const COL_SPAN_CLASS: Record<number, string> = {
               @update:model-value="updateSelected({ colSpan: Number($event) })"
             />
           </UFormField>
-          <div
-            v-if="selectedField.component !== 'UFullAddress'"
-            class="flex items-center justify-between"
-          >
+          <div class="flex items-center justify-between">
             <span class="text-sm text-gray-700">Required</span>
             <USwitch
               :model-value="selectedField.required ?? false"
@@ -1743,91 +1724,6 @@ const COL_SPAN_CLASS: Record<number, string> = {
             </div>
           </template>
 
-          <!-- Full Address sub-fields config -->
-          <template v-if="selectedField.component === 'UFullAddress'">
-            <div class="space-y-3">
-              <p class="text-sm font-medium text-gray-700">Address Levels</p>
-              <div
-                v-for="level in ADDRESS_LEVELS"
-                :key="level"
-                class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
-              >
-                <p class="text-xs font-semibold text-gray-500">
-                  {{ addressLevelLabels[level] }}
-                </p>
-                <UFormField label="Label">
-                  <UInput
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.label ?? ''
-                    "
-                    placeholder="Label"
-                    size="xs"
-                    @update:model-value="
-                      updateFullAddressSubField(selectedField, level, {
-                        label: $event as string,
-                      })
-                    "
-                  />
-                </UFormField>
-                <UFormField label="Placeholder">
-                  <UInput
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.placeholder ?? ''
-                    "
-                    placeholder="Placeholder"
-                    size="xs"
-                    @update:model-value="
-                      updateFullAddressSubField(selectedField, level, {
-                        placeholder: $event as string,
-                      })
-                    "
-                  />
-                </UFormField>
-                <UFormField label="API Endpoint">
-                  <UInput
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.apiEndpoint ?? ''
-                    "
-                    placeholder="/api/address/..."
-                    size="xs"
-                    @update:model-value="
-                      updateFullAddressSubField(selectedField, level, {
-                        apiEndpoint: $event as string,
-                      })
-                    "
-                  />
-                </UFormField>
-                <UFormField label="Width">
-                  <USelect
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.colSpan ?? 6
-                    "
-                    :items="colSpanOptions"
-                    size="xs"
-                    @update:model-value="
-                      updateFullAddressSubField(selectedField, level, {
-                        colSpan: Number($event),
-                      })
-                    "
-                  />
-                </UFormField>
-                <div class="flex items-center justify-between">
-                  <span class="text-xs text-gray-600">Required</span>
-                  <USwitch
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.required ?? false
-                    "
-                    size="xs"
-                    @update:model-value="
-                      updateFullAddressSubField(selectedField, level, {
-                        required: $event as boolean,
-                      })
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </template>
 
           <UButton
             block

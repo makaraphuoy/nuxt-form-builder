@@ -32,6 +32,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from "vue";
+import { useFormBuilderFetch } from "~/composables/useFormBuilderFetch";
 
 interface Props {
   field: any;
@@ -47,6 +48,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: any];
 }>();
 
+const { apiFetch, proxyBase } = useFormBuilderFetch();
 const isLoading = ref(false);
 const searchQuery = ref("");
 const allOptions = ref<any[]>([]);
@@ -118,13 +120,7 @@ const fetchOptions = async (query: string) => {
     const url = new URL(endpoint, window.location.origin);
     url.searchParams.set(searchParam, query);
 
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const data = await apiFetch<any>(url.pathname + url.search);
 
     // Transform response using provided function or default mapping
     if (transformResponse && typeof transformResponse === "function") {

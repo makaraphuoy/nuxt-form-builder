@@ -131,14 +131,15 @@ const OBJECT_VALUE_COMPONENTS = [
   "UAddress",
   "UAsyncSelect",
   "UDateRange",
-  "UFullAddress",
 ];
 const ARRAY_VALUE_COMPONENTS = ["UCheckboxGroup", "UCheckbox", "UTagInput"];
 const TABLE_COMPONENTS = ["UTableField", "URepeater"];
 
+
 export function buildValidation(
   rules: ValidationRule[],
   component: string,
+  fieldProps?: Record<string, any>,
 ): ZodType {
   if (OBJECT_VALUE_COMPONENTS.includes(component)) {
     const req = rules.find((r) => r.type === "required");
@@ -241,29 +242,32 @@ function interpretField(jf: JSONField): FieldWithConditions {
 
   // validation rules → Zod schema
   if (jf.validation?.length) {
-    field.validation = buildValidation(jf.validation, jf.component);
+    field.validation = buildValidation(jf.validation, jf.component, jf.props);
   } else if (jf.required) {
     const msg = `${jf.label || jf.name} is required`;
-    const usesObjectValue = [
-      "UFileInput",
-      "UFileUpload",
-      "UAddress",
-      "UAsyncSelect",
-      "UDateRange",
-    ].includes(jf.component);
-    const usesArrayValue = [
-      "UCheckboxGroup",
-      "UCheckbox",
-      "UTagInput",
-    ].includes(jf.component);
-    const usesTableValue = TABLE_COMPONENTS.includes(jf.component);
-    field.validation = usesObjectValue
-      ? z.any().refine((v) => v !== null && v !== undefined, { message: msg })
-      : usesArrayValue
-        ? z.array(z.string()).min(1, msg)
-        : usesTableValue
-          ? z.array(z.any()).min(1, msg)
-          : z.string().min(1, msg);
+
+    {
+      const usesObjectValue = [
+        "UFileInput",
+        "UFileUpload",
+        "UAddress",
+        "UAsyncSelect",
+        "UDateRange",
+      ].includes(jf.component);
+      const usesArrayValue = [
+        "UCheckboxGroup",
+        "UCheckbox",
+        "UTagInput",
+      ].includes(jf.component);
+      const usesTableValue = TABLE_COMPONENTS.includes(jf.component);
+      field.validation = usesObjectValue
+        ? z.any().refine((v) => v !== null && v !== undefined, { message: msg })
+        : usesArrayValue
+          ? z.array(z.string()).min(1, msg)
+          : usesTableValue
+            ? z.array(z.any()).min(1, msg)
+            : z.string().min(1, msg);
+    }
   }
 
   return field;

@@ -21,7 +21,6 @@ function getFieldDefault(field: FieldWithConditions): any {
       return "";
     case "UAsyncSelect":
     case "UAddress":
-    case "UFullAddress":
       return null; // object/complex values — use z.any() in validation
     case "UTableField":
     case "URepeater":
