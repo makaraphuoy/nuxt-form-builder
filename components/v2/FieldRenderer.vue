@@ -168,6 +168,18 @@ function fieldProps() {
       @change="onFileChange"
     />
 
+    <!-- SelectMenu — must use value-key so v-model holds the string value, not the full option object -->
+    <USelectMenu
+      v-else-if="field.component === 'USelectMenu'"
+      v-model="value"
+      :items="options?.length ? options : (field.props?.items ?? [])"
+      value-key="value"
+      :placeholder="field.placeholder"
+      :disabled="disabled"
+      v-bind="{ ...field.attrs }"
+      class="w-full"
+    />
+
     <!-- all other Nuxt UI components -->
     <component
       v-else

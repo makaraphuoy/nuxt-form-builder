@@ -6,6 +6,12 @@ export default defineNuxtConfig({
   modules: ["@nuxt/ui", "@nuxtjs/leaflet"],
   css: ["~/assets/css/main.css"],
   colorMode: {
-    preference: "light", // default value of $colorMode.preference
+    preference: "light",
+  },
+  nitro: {
+    storage: {
+      // Persists to .data/db/ — survives hot reloads & server restarts
+      db: { driver: "fs", base: "./.data/db" },
+    },
   },
 });

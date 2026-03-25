@@ -62,7 +62,7 @@ const cards = [
     label: "API",
     badge: "success",
     icon: "i-heroicons-server",
-    title: "My  Dynamic Forms",
+    title: "My Workspace",
     description:
       "Forms loaded from server JSON configs. No code changes needed — add new forms via API.",
     to: "/dynamic",

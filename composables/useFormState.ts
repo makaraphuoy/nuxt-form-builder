@@ -32,7 +32,7 @@ function getFieldDefault(field: FieldWithConditions): any {
     case "UOtpInput":
       return "";
     default:
-      return field.type === "number" ? null : "";
+      return "";
   }
 }
 

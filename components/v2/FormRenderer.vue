@@ -92,7 +92,11 @@ function colSpanClass(field: FieldWithConditions): string {
 }
 
 async function handleFieldChange(field: FieldWithConditions, newValue: any) {
-  setValue(field.name, newValue);
+  // UInput type="number" emits a JS number — coerce to string for Zod schema compatibility
+  const coerced = (field.type === "number" && typeof newValue === "number")
+    ? String(newValue)
+    : newValue;
+  setValue(field.name, coerced);
   emit("change", field.name, newValue);
   if (formRef.value) {
     try {
@@ -128,6 +132,7 @@ defineExpose({ values, errors, validate: validateForm });
     ref="formRef"
     :schema="schema"
     :state="values"
+    :validate-on="['submit', 'blur', 'change']"
     class="space-y-4"
     @submit.prevent
   >

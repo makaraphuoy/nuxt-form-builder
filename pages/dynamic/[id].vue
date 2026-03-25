@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref } from "vue";
 import { interpretConfig } from "~/utils/form-schema";
 import type { JSONFormConfig } from "~/utils/form-schema";
-import { useFormStorage } from "~/composables/useFormStorage";
 
 definePageMeta({ title: "Dynamic Form" });
 
 const route = useRoute();
 const toast = useToast();
-const { loadForm } = useFormStorage();
 
 const {
   data: jsonConfig,
@@ -16,21 +14,8 @@ const {
   error,
 } = await useFetch<JSONFormConfig>(`/api/forms/${route.params.id}`);
 
-// fallback: check localStorage when API returns 404
-const localConfig = ref<JSONFormConfig | null>(null);
-const isLocal = computed(() => !!localConfig.value && !!error.value);
-
-onMounted(() => {
-  if (error.value) {
-    const saved = loadForm(route.params.id as string);
-    if (saved) localConfig.value = saved.config;
-  }
-});
-
-const activeConfig = computed(() => jsonConfig.value ?? localConfig.value);
-
 const runtimeConfig = computed(() =>
-  activeConfig.value ? interpretConfig(activeConfig.value) : null,
+  jsonConfig.value ? interpretConfig(jsonConfig.value) : null,
 );
 
 const submittedData = ref<Record<string, any> | null>(null);
@@ -61,8 +46,8 @@ function handleSubmit(data: Record<string, any>) {
           <USkeleton class="h-96 w-full rounded-xl" />
         </div>
 
-        <!-- Not found in API or localStorage -->
-        <UCard v-else-if="error && !localConfig" class="text-center py-12">
+        <!-- Not found -->
+        <UCard v-else-if="error" class="text-center py-12">
           <UIcon
             name="i-heroicons-exclamation-circle"
             class="size-12 text-red-400 mx-auto mb-4"
@@ -82,24 +67,20 @@ function handleSubmit(data: Record<string, any>) {
           <div class="mb-8 flex items-start justify-between">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <UBadge :color="isLocal ? 'warning' : 'primary'" variant="soft">
-                  {{ isLocal ? "Local" : "Dynamic" }}
-                </UBadge>
+                <UBadge color="primary" variant="soft">Dynamic</UBadge>
                 <span class="text-xs text-gray-400">{{ route.params.id }}</span>
               </div>
               <h1 class="text-2xl font-bold text-gray-900">
-                {{ activeConfig?.title }}
+                {{ jsonConfig?.title }}
               </h1>
               <p
-                v-if="activeConfig?.description"
+                v-if="jsonConfig?.description"
                 class="text-gray-500 mt-1 text-sm"
               >
-                {{ activeConfig.description }}
+                {{ jsonConfig.description }}
               </p>
             </div>
-            <!-- Edit in builder for local forms -->
             <UButton
-              v-if="isLocal"
               :to="`/builder?load=${route.params.id}`"
               size="sm"
               variant="outline"
@@ -119,7 +100,7 @@ function handleSubmit(data: Record<string, any>) {
             <V2WizardRenderer :config="runtimeConfig" @submit="handleSubmit" />
           </template>
 
-          <!-- Single-page flat fields (original behaviour preserved) -->
+          <!-- Single-page flat fields -->
           <template v-else-if="runtimeConfig.pages.length === 1">
             <UCard>
               <V2FormRenderer
@@ -133,7 +114,7 @@ function handleSubmit(data: Record<string, any>) {
                       icon="i-heroicons-paper-airplane"
                       @click="submit"
                     >
-                      {{ activeConfig?.submitButtonText ?? "Submit" }}
+                      {{ jsonConfig?.submitButtonText ?? "Submit" }}
                     </UButton>
                   </div>
                 </template>
