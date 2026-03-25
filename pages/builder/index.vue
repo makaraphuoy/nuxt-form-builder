@@ -23,6 +23,7 @@ const modal = useConfirmModal();
 const isMultiStep = ref(false);
 const formTitle = ref("My Form");
 const formId = ref(`form-${Date.now()}`);
+const serviceCode = ref("");
 const pages = ref<CanvasPage[]>([newPage("Step 1")]);
 const activePageIdx = ref(0);
 const activeSectionIdx = ref(0);
@@ -294,7 +295,7 @@ const {
   savedForms, refresh, deleteForm,
   showPreview, showLoad, previewConfig, previewKey,
   save, loadSaved, exportJson, openPreview,
-} = useFormPersistence({ pages, formTitle, formId, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel });
+} = useFormPersistence({ pages, formTitle, formId, serviceCode, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel });
 
 // ── WYSIWYG canvas helpers ──
 
@@ -319,6 +320,13 @@ const COL_SPAN_CLASS: Record<number, string> = {
           variant="ghost"
           size="sm"
           class="w-48 font-semibold"
+        />
+        <UInput
+          v-model="serviceCode"
+          placeholder="Service code (optional)"
+          variant="ghost"
+          size="sm"
+          class="w-44 font-mono text-gray-400"
         />
         <UBadge color="warning" variant="soft">Builder</UBadge>
       </div>

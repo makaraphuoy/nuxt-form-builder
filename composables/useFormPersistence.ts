@@ -10,13 +10,14 @@ export function useFormPersistence(params: {
   pages: Ref<CanvasPage[]>;
   formTitle: Ref<string>;
   formId: Ref<string>;
+  serviceCode: Ref<string>;
   isMultiStep: Ref<boolean>;
   activePageIdx: Ref<number>;
   activeSectionIdx: Ref<number>;
   selectedId: Ref<string | null>;
   rightPanel: Ref<"field" | "row" | "section" | "page" | null>;
 }) {
-  const { pages, formTitle, formId, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel } = params;
+  const { pages, formTitle, formId, serviceCode, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel } = params;
 
   const { savedForms, saveForm, loadForm, deleteForm, refresh } = useFormStorage();
   const toast = useToast();
@@ -28,7 +29,7 @@ export function useFormPersistence(params: {
   const previewKey = ref(0);
 
   function save() {
-    saveForm(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value), formTitle.value);
+    saveForm(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value, serviceCode.value || undefined), formTitle.value);
     refresh();
     toast.add({ title: "Saved!", color: "success", icon: "i-heroicons-check-circle" });
   }
@@ -38,6 +39,7 @@ export function useFormPersistence(params: {
     if (!entry) return;
     formTitle.value = entry.config.title;
     formId.value = entry.config.id;
+    serviceCode.value = entry.config.service_code ?? "";
     isMultiStep.value = entry.config.pages.length > 1;
 
     pages.value = entry.config.pages.map((jp: any) => ({
@@ -76,7 +78,7 @@ export function useFormPersistence(params: {
   }
 
   function exportJson() {
-    const json = JSON.stringify(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value), null, 2);
+    const json = JSON.stringify(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value, serviceCode.value || undefined), null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -87,7 +89,7 @@ export function useFormPersistence(params: {
   }
 
   function openPreview() {
-    previewConfig.value = interpretConfig(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value));
+    previewConfig.value = interpretConfig(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value, serviceCode.value || undefined));
     previewKey.value++;
     showPreview.value = true;
   }

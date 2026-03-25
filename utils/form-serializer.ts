@@ -21,6 +21,7 @@ export function buildConfig(
   formId: string,
   formTitle: string,
   isMultiStep: boolean,
+  serviceCode?: string,
 ): JSONFormConfig {
   const jsonPages = pages.map((page) => ({
     id: page._id,
@@ -42,6 +43,7 @@ export function buildConfig(
   return {
     id: formId,
     title: formTitle,
+    ...(serviceCode ? { service_code: serviceCode } : {}),
     pages: isMultiStep ? jsonPages : [jsonPages[0]],
   };
 }

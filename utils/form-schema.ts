@@ -82,6 +82,7 @@ export interface JSONPage {
 export interface JSONFormConfig {
   id: string;
   title: string;
+  service_code?: string;
   description?: string;
   submitButtonText?: string;
   previousButtonText?: string;
