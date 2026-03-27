@@ -29,6 +29,7 @@ export const supportsRequiredMessage = [
   "UOtpInput",
   "UMapPicker",
   "UCamDigiKey",
+  "UMocCompany",
 ];
 
 export const hasItems = [

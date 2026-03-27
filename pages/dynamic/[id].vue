@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { interpretConfig } from "~/utils/form-schema";
 import type { JSONFormConfig } from "~/utils/form-schema";
 import { useFormStorage } from "~/composables/useFormStorage";
+import { generateMockValuesFromJson } from "~/utils/camdigikey-mocks";
 
 definePageMeta({ title: "Dynamic Form" });
 
@@ -31,6 +32,10 @@ const activeConfig = computed(() => jsonConfig.value ?? localConfig.value);
 
 const runtimeConfig = computed(() =>
   activeConfig.value ? interpretConfig(activeConfig.value) : null,
+);
+
+const mockInitialValues = computed(() =>
+  activeConfig.value ? generateMockValuesFromJson(activeConfig.value) : {},
 );
 
 const submittedData = ref<Record<string, any> | null>(null);
@@ -116,7 +121,7 @@ function handleSubmit(data: Record<string, any>) {
               runtimeConfig.pages[0].sections
             "
           >
-            <V2WizardRenderer :config="runtimeConfig" @submit="handleSubmit" />
+            <V2WizardRenderer :config="runtimeConfig" :initial-values="mockInitialValues" @submit="handleSubmit" />
           </template>
 
           <!-- Single-page flat fields (original behaviour preserved) -->
@@ -124,6 +129,7 @@ function handleSubmit(data: Record<string, any>) {
             <UCard>
               <V2FormRenderer
                 :fields="runtimeConfig.pages[0].fields ?? []"
+                :initial-values="mockInitialValues"
                 @submit="handleSubmit"
               >
                 <template #actions="{ submit }">
@@ -143,7 +149,7 @@ function handleSubmit(data: Record<string, any>) {
 
           <!-- Multi-page wizard -->
           <template v-else>
-            <V2WizardRenderer :config="runtimeConfig" @submit="handleSubmit" />
+            <V2WizardRenderer :config="runtimeConfig" :initial-values="mockInitialValues" @submit="handleSubmit" />
           </template>
 
           <!-- Submitted payload -->

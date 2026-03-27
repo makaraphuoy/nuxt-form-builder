@@ -49,7 +49,7 @@ export interface PaletteItem {
   isRepeater?: boolean;
   isMap?: boolean;
   isCamDigiKey?: boolean;
-  isCamDigiKeyCompany?: boolean;
+  isMocCompany?: boolean;
 }
 
 export const palette: PaletteItem[] = [
@@ -147,10 +147,10 @@ export const palette: PaletteItem[] = [
     isCamDigiKey: true,
   },
   {
-    component: "UCamDigiKey",
+    component: "UMocCompany",
     label: "MOC Company",
     icon: "i-heroicons-building-office",
-    isCamDigiKeyCompany: true,
+    isMocCompany: true,
   },
   {
     component: "UTableField",
@@ -350,17 +350,17 @@ export function makeField(
       },
     ];
   }
-  if (item.isCamDigiKeyCompany) {
+  if (item.isMocCompany) {
     return [
       {
         _id: uid(),
-        name: `camdigikey_company_${Date.now()}`,
+        name: `moc_company_${Date.now()}`,
         label: "MOC Company",
-        component: "UCamDigiKey",
+        component: "UMocCompany",
         type: "object",
         colSpan: 12,
         row: sectionFields.length + 1,
-        props: { type: "company", apiEndpoint: "" },
+        props: { apiEndpoint: "" },
       },
     ];
   }

@@ -2,6 +2,7 @@
 import type { FieldWithConditions } from "~/types/form-builder";
 import { resolveComponentMap } from "~/utils/ui-helper";
 import BaseCamDigiKey from "~/components/base/camdigikey.vue";
+import BaseMocCompany from "~/components/base/moc-company.vue";
 
 interface Props {
   field: FieldWithConditions;
@@ -103,8 +104,12 @@ function fieldProps() {
       class="block w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
       @change="onFileChange" />
 
-    <!-- CamDigiKey identity -->
+    <!-- CamDigiKey personal identity -->
     <BaseCamDigiKey v-else-if="field.component === 'UCamDigiKey'" :field="field" :model-value="value"
+      :disabled="disabled" @update:model-value="value = $event" />
+
+    <!-- MOC Company identity -->
+    <BaseMocCompany v-else-if="field.component === 'UMocCompany'" :field="field" :model-value="value"
       :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- all other Nuxt UI components -->

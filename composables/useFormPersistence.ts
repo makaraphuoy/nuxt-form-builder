@@ -5,6 +5,7 @@ import { interpretConfig } from "~/utils/form-schema";
 import { buildConfig } from "~/utils/form-serializer";
 import { uid } from "~/utils/canvas-factories";
 import type { CanvasField, CanvasPage } from "~/pages/builder/config";
+import { MOCK_PERSONAL, MOCK_COMPANY } from "~/utils/camdigikey-mocks";
 
 export function useFormPersistence(params: {
   pages: Ref<CanvasPage[]>;
@@ -25,7 +26,27 @@ export function useFormPersistence(params: {
   const showPreview = ref(false);
   const showLoad = ref(false);
   const previewConfig = ref<ReturnType<typeof interpretConfig> | null>(null);
+  const previewInitialValues = ref<Record<string, any>>({});
   const previewKey = ref(0);
+
+  function generateMockValues(canvasPages: CanvasPage[]): Record<string, any> {
+    const values: Record<string, any> = {};
+    for (const page of canvasPages) {
+      for (const section of page.sections ?? []) {
+        for (const row of section.rows ?? []) {
+          for (const field of row.fields) {
+            if (field.component === "UCamDigiKey") values[field.name] = MOCK_PERSONAL;
+            else if (field.component === "UMocCompany") values[field.name] = MOCK_COMPANY;
+          }
+        }
+        for (const field of (section as any).fields ?? []) {
+          if (field.component === "UCamDigiKey") values[field.name] = MOCK_PERSONAL;
+          else if (field.component === "UMocCompany") values[field.name] = MOCK_COMPANY;
+        }
+      }
+    }
+    return values;
+  }
 
   function save() {
     saveForm(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value), formTitle.value);
@@ -88,6 +109,7 @@ export function useFormPersistence(params: {
 
   function openPreview() {
     previewConfig.value = interpretConfig(buildConfig(pages.value, formId.value, formTitle.value, isMultiStep.value));
+    previewInitialValues.value = generateMockValues(pages.value);
     previewKey.value++;
     showPreview.value = true;
   }
@@ -104,6 +126,7 @@ export function useFormPersistence(params: {
     showPreview,
     showLoad,
     previewConfig,
+    previewInitialValues,
     previewKey,
     save,
     loadSaved,

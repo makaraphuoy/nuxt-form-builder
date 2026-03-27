@@ -292,7 +292,7 @@ const {
 
 const {
   savedForms, refresh, deleteForm,
-  showPreview, showLoad, previewConfig, previewKey,
+  showPreview, showLoad, previewConfig, previewInitialValues, previewKey,
   save, loadSaved, exportJson, openPreview,
 } = useFormPersistence({ pages, formTitle, formId, isMultiStep, activePageIdx, activeSectionIdx, selectedId, rightPanel });
 
@@ -1109,7 +1109,7 @@ const COL_SPAN_CLASS: Record<number, string> = {
               previewConfig.pages.length === 1 &&
               previewConfig.pages[0].sections
             ">
-              <V2WizardRenderer :config="previewConfig" @submit="
+              <V2WizardRenderer :config="previewConfig" :initial-values="previewInitialValues" @submit="
                 (d) => {
                   console.log('Preview:', d);
                   showPreview = false;
@@ -1118,7 +1118,7 @@ const COL_SPAN_CLASS: Record<number, string> = {
             </template>
             <!-- single-page flat fields → simple renderer -->
             <template v-else-if="previewConfig.pages.length === 1">
-              <V2FormRenderer :fields="previewConfig.pages[0].fields ?? []" @submit="
+              <V2FormRenderer :fields="previewConfig.pages[0].fields ?? []" :initial-values="previewInitialValues" @submit="
                 (d) => {
                   console.log('Preview:', d);
                   showPreview = false;
@@ -1134,7 +1134,7 @@ const COL_SPAN_CLASS: Record<number, string> = {
             </template>
             <!-- multi-page wizard -->
             <template v-else>
-              <V2WizardRenderer :config="previewConfig" @submit="
+              <V2WizardRenderer :config="previewConfig" :initial-values="previewInitialValues" @submit="
                 (d: Record<string, any>) => {
                   console.log('Preview:', d);
                   showPreview = false;
