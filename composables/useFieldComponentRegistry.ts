@@ -2,6 +2,7 @@ import type { Component } from "vue";
 import BaseDatePicker from "~/components/base/date-picker.vue";
 import BaseAddress from "~/components/base/address.vue";
 import BaseAsyncSelect from "~/components/base/asyn-select.vue";
+import BaseCamDigiKey from "~/components/base/camdigikey.vue";
 import { resolveComponentMap } from "~/utils/ui-helper";
 // import BaseFileInput from '~/components/form/BaseFileInput.vue'
 
@@ -19,6 +20,7 @@ const initializeDefaults = () => {
   componentRegistry.set("UCalendar", BaseDatePicker);
   componentRegistry.set("UAddress", BaseAddress);
   componentRegistry.set("UAsyncSelect", BaseAsyncSelect);
+  componentRegistry.set("UCamDigiKey", BaseCamDigiKey);
   // componentRegistry.set('UFileInput', BaseFileInput)
 
   // Nuxt UI components - these will be resolved dynamically

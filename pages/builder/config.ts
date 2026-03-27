@@ -1,6 +1,6 @@
 import type { JSONField } from "~/utils/form-schema";
 
-// ─── Canvas types 
+// ─── Canvas types
 
 export interface CanvasField extends JSONField {
   _id: string;
@@ -48,6 +48,7 @@ export interface PaletteItem {
   isOtp?: boolean;
   isRepeater?: boolean;
   isMap?: boolean;
+  isCamDigiKey?: boolean;
 }
 
 export const palette: PaletteItem[] = [
@@ -139,6 +140,12 @@ export const palette: PaletteItem[] = [
     isAddressGroup: true,
   },
   {
+    component: "UCamDigiKey",
+    label: "CamDigiKey",
+    icon: "i-heroicons-identification",
+    isCamDigiKey: true,
+  },
+  {
     component: "UTableField",
     label: "Table",
     icon: "i-heroicons-table-cells",
@@ -174,7 +181,7 @@ export const palette: PaletteItem[] = [
   },
 ];
 
-// ─── Field factory 
+// ─── Field factory
 
 export function makeField(
   item: PaletteItem,
@@ -318,6 +325,22 @@ export function makeField(
             { key: "field1", label: "Field 1", type: "text" },
             { key: "field2", label: "Field 2", type: "text" },
           ],
+        },
+      },
+    ];
+  }
+  if (item.isCamDigiKey) {
+    return [
+      {
+        _id: uid(),
+        name: `camdigikey_${Date.now()}`,
+        label: "CamDigiKey Identity",
+        component: "UCamDigiKey",
+        type: "object",
+        colSpan: 12,
+        row: sectionFields.length + 1,
+        props: {
+          apiEndpoint: "",
         },
       },
     ];

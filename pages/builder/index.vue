@@ -308,85 +308,42 @@ const COL_SPAN_CLASS: Record<number, string> = {
 <template>
   <div class="h-screen bg-gray-50 flex flex-col">
     <!-- Header -->
-    <div
-      class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-3 shrink-0"
-    >
+    <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-3 shrink-0">
       <div class="flex items-center gap-3">
         <AppBackButton fallback="/" />
-        <UInput
-          v-model="formTitle"
-          placeholder="Form title…"
-          variant="ghost"
-          size="sm"
-          class="w-48 font-semibold"
-        />
+        <UInput v-model="formTitle" placeholder="Form title…" variant="ghost" size="sm" class="w-48 font-semibold" />
         <UBadge color="warning" variant="soft">Builder</UBadge>
       </div>
 
       <div class="flex items-center gap-3">
         <!-- Multi-step toggle -->
-        <div
-          class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-1.5"
-        >
+        <div class="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-1.5">
           <UIcon name="i-heroicons-document" class="size-4 text-gray-400" />
           <span class="text-xs text-gray-600">Multi-step</span>
           <USwitch v-model="isMultiStep" size="sm" />
         </div>
 
-        <UButton
-          size="sm"
-          variant="outline"
-          color="neutral"
-          leading-icon="i-heroicons-folder-open"
-          @click="showLoad = true"
-          >Load</UButton
-        >
-        <UButton
-          size="sm"
-          variant="outline"
-          color="neutral"
-          leading-icon="i-heroicons-arrow-down-tray"
-          @click="exportJson"
-          >Export</UButton
-        >
-        <UButton
-          size="sm"
-          variant="outline"
-          leading-icon="i-heroicons-eye"
-          @click="openPreview"
-          >Preview</UButton
-        >
-        <UButton
-          size="sm"
-          leading-icon="i-heroicons-cloud-arrow-up"
-          @click="save"
-          >Save</UButton
-        >
+        <UButton size="sm" variant="outline" color="neutral" leading-icon="i-heroicons-folder-open"
+          @click="showLoad = true">Load</UButton>
+        <UButton size="sm" variant="outline" color="neutral" leading-icon="i-heroicons-arrow-down-tray"
+          @click="exportJson">Export</UButton>
+        <UButton size="sm" variant="outline" leading-icon="i-heroicons-eye" @click="openPreview">Preview</UButton>
+        <UButton size="sm" leading-icon="i-heroicons-cloud-arrow-up" @click="save">Save</UButton>
       </div>
     </div>
 
     <!-- Three-panel layout -->
     <div class="flex flex-1 overflow-hidden">
       <!-- Left: field palette -->
-      <aside
-        class="w-52 bg-white border-r border-gray-200 p-1 flex flex-col shrink-0 overflow-hidden"
-      >
-        <p
-          class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1 shrink-0"
-        >
+      <aside class="w-52 bg-white border-r border-gray-200 p-1 flex flex-col shrink-0 overflow-hidden">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1 shrink-0">
           Fields
         </p>
-        <div
-          class="space-y-1.5 overflow-y-auto flex-1 py-3"
-          style="scrollbar-width: thin; scrollbar-color: #e5e7eb transparent"
-        >
-          <div
-            v-for="item in palette"
-            :key="item.label + item.component"
+        <div class="space-y-1.5 overflow-y-auto flex-1 py-3"
+          style="scrollbar-width: thin; scrollbar-color: #e5e7eb transparent">
+          <div v-for="item in palette" :key="item.label + item.component"
             class="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-gray-100 bg-gray-50 text-sm text-gray-700 cursor-grab active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 transition-colors select-none"
-            draggable="true"
-            @dragstart="onPaletteDragStart(item, $event)"
-          >
+            draggable="true" @dragstart="onPaletteDragStart(item, $event)">
             <UIcon :name="item.icon" class="size-4 shrink-0" />
             {{ item.label }}
           </div>
@@ -396,14 +353,9 @@ const COL_SPAN_CLASS: Record<number, string> = {
       <!-- Center: canvas -->
       <main class="flex-1 overflow-hidden flex flex-col">
         <!-- Page tabs (multi-step only) -->
-        <div
-          v-if="isMultiStep"
-          class="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-2 shrink-0 overflow-x-auto"
-        >
-          <button
-            v-for="(page, pi) in pages"
-            :key="page._id"
-            draggable="true"
+        <div v-if="isMultiStep"
+          class="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-2 shrink-0 overflow-x-auto">
+          <button v-for="(page, pi) in pages" :key="page._id" draggable="true"
             class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap cursor-grab active:cursor-grabbing select-none"
             :class="[
               pi === activePageIdx
@@ -413,59 +365,28 @@ const COL_SPAN_CLASS: Record<number, string> = {
                 ? 'ring-2 ring-primary-400 ring-offset-1'
                 : '',
               draggingPageIdx === pi ? 'opacity-40' : '',
-            ]"
-            @click="setActivePage(pi)"
-            @dragstart="onPageTabDragStart(pi, $event)"
-            @dragover="onPageTabDragOver(pi, $event)"
-            @dragleave="dragOverPageIdx = null"
-            @drop="onPageTabDrop(pi, $event)"
-            @dragend="onPageTabDragEnd"
-          >
-            <UIcon
-              name="i-heroicons-bars-2"
-              class="size-3.5 text-gray-300 shrink-0"
-            />
+            ]" @click="setActivePage(pi)" @dragstart="onPageTabDragStart(pi, $event)"
+            @dragover="onPageTabDragOver(pi, $event)" @dragleave="dragOverPageIdx = null"
+            @drop="onPageTabDrop(pi, $event)" @dragend="onPageTabDragEnd">
+            <UIcon name="i-heroicons-bars-2" class="size-3.5 text-gray-300 shrink-0" />
             <span>{{ page.title || `Step ${pi + 1}` }}</span>
-            <UButton
-              size="xs"
-              variant="ghost"
-              color="neutral"
-              icon="i-heroicons-document-duplicate"
+            <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-document-duplicate"
               class="size-4 p-0 ml-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              @click.stop="duplicatePage(pi)"
-            />
-            <UButton
-              v-if="pages.length > 1"
-              size="xs"
-              variant="ghost"
-              color="neutral"
-              icon="i-heroicons-x-mark"
-              class="size-4 p-0"
-              @click.stop="removePage(pi)"
-            />
+              @click.stop="duplicatePage(pi)" />
+            <UButton v-if="pages.length > 1" size="xs" variant="ghost" color="neutral" icon="i-heroicons-x-mark"
+              class="size-4 p-0" @click.stop="removePage(pi)" />
           </button>
-          <UButton
-            size="xs"
-            variant="ghost"
-            leading-icon="i-heroicons-plus"
-            @click="addPage"
-          >
+          <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" @click="addPage">
             Add Step
           </UButton>
         </div>
 
         <!-- Scrollable body -->
-        <div
-          class="flex-1 p-6 overflow-y-auto"
-          style="scrollbar-width: none; scrollbar-color: #e5e7eb transparent"
-        >
+        <div class="flex-1 p-6 overflow-y-auto" style="scrollbar-width: none; scrollbar-color: #e5e7eb transparent">
           <div class="max-w-5xl mx-auto space-y-4">
             <!-- Section tabs -->
             <div class="flex items-center gap-2 flex-wrap">
-              <button
-                v-for="(sec, si) in currentPage.sections"
-                :key="sec._id"
-                draggable="true"
+              <button v-for="(sec, si) in currentPage.sections" :key="sec._id" draggable="true"
                 class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border cursor-grab active:cursor-grabbing select-none"
                 :class="[
                   si === activeSectionIdx
@@ -475,91 +396,51 @@ const COL_SPAN_CLASS: Record<number, string> = {
                     ? 'ring-2 ring-primary-400 ring-offset-1'
                     : '',
                   draggingSectionIdx === si ? 'opacity-40' : '',
-                ]"
-                @click="setActiveSection(si)"
-                @dragstart="onSectionTabDragStart(si, $event)"
-                @dragover="onSectionTabDragOver(si, $event)"
-                @dragleave="dragOverSectionTabIdx = null"
-                @drop="onSectionTabDrop(si, $event)"
-                @dragend="onSectionTabDragEnd"
-              >
-                <UIcon
-                  name="i-heroicons-bars-2"
-                  class="size-3 text-gray-300 shrink-0"
-                />
+                ]" @click="setActiveSection(si)" @dragstart="onSectionTabDragStart(si, $event)"
+                @dragover="onSectionTabDragOver(si, $event)" @dragleave="dragOverSectionTabIdx = null"
+                @drop="onSectionTabDrop(si, $event)" @dragend="onSectionTabDragEnd">
+                <UIcon name="i-heroicons-bars-2" class="size-3 text-gray-300 shrink-0" />
                 <UIcon name="i-heroicons-rectangle-stack" class="size-3.5" />
                 {{ sec.title || `Section ${si + 1}` }}
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  color="neutral"
-                  icon="i-heroicons-document-duplicate"
+                <UButton size="xs" variant="ghost" color="neutral" icon="i-heroicons-document-duplicate"
                   class="size-3.5 p-0 ml-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                  @click.stop="duplicateSection(si)"
-                />
-                <UButton
-                  v-if="currentPage.sections.length > 1"
-                  size="xs"
-                  variant="ghost"
-                  color="neutral"
-                  icon="i-heroicons-x-mark"
-                  class="size-3.5 p-0"
-                  @click.stop="removeSection(si)"
-                />
+                  @click.stop="duplicateSection(si)" />
+                <UButton v-if="currentPage.sections.length > 1" size="xs" variant="ghost" color="neutral"
+                  icon="i-heroicons-x-mark" class="size-3.5 p-0" @click.stop="removeSection(si)" />
               </button>
-              <UButton
-                size="xs"
-                variant="ghost"
-                leading-icon="i-heroicons-plus"
-                @click="addSection"
-              >
+              <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" @click="addSection">
                 Add Section
               </UButton>
             </div>
 
             <!-- Section card -->
-            <div
-              class="bg-white border border-gray-200 rounded-2xl overflow-hidden"
-              :class="{ 'border-primary-300': activeSectionIdx >= 0 }"
-            >
+            <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden"
+              :class="{ 'border-primary-300': activeSectionIdx >= 0 }">
               <!-- Header -->
               <div
                 class="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50 cursor-pointer"
                 @click="
                   rightPanel = 'section';
-                  selectedId = null;
-                "
-              >
+                selectedId = null;
+                ">
                 <div class="flex items-center gap-2">
-                  <UIcon
-                    name="i-heroicons-rectangle-stack"
-                    class="size-4 text-gray-400"
-                  />
+                  <UIcon name="i-heroicons-rectangle-stack" class="size-4 text-gray-400" />
                   <span class="text-sm font-semibold text-gray-700">{{
                     currentSection?.title || "Section"
                   }}</span>
-                  <span
-                    v-if="currentSection?.description"
-                    class="text-xs text-gray-400"
-                    >· {{ currentSection.description }}</span
-                  >
+                  <span v-if="currentSection?.description" class="text-xs text-gray-400">· {{ currentSection.description
+                  }}</span>
                 </div>
-                <UIcon
-                  name="i-heroicons-pencil-square"
-                  class="size-4 text-gray-300"
-                />
+                <UIcon name="i-heroicons-pencil-square" class="size-4 text-gray-300" />
               </div>
 
               <!-- Section body: rows -->
               <div class="p-3 space-y-1">
                 <!-- Empty section -->
-                <div
-                  v-if="!currentSection?.rows.length"
+                <div v-if="!currentSection?.rows.length"
                   class="border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center py-40 text-center"
                   @dragover.prevent="dragOverSectionId = currentSection?._id ?? null; dragOverIndex = 0"
-                  @dragleave="onDragLeave"
-                  @drop.prevent="onDrop(currentSection!._id, 0, $event)"
-                >
+                  @dragleave="onDragLeave" @drop.prevent="onDrop(currentSection!._id, 0, $event)">
                   <UIcon name="i-heroicons-cursor-arrow-rays" class="size-8 text-gray-300 mb-2" />
                   <p class="text-sm text-gray-400">Drag fields here to create a row</p>
                 </div>
@@ -567,79 +448,63 @@ const COL_SPAN_CLASS: Record<number, string> = {
                 <!-- Rows -->
                 <template v-else>
                   <!-- Before-first-row drop zone -->
-                  <div
-                    class="h-1.5 rounded-full transition-colors"
+                  <div class="h-1.5 rounded-full transition-colors"
                     :class="dragOverSectionId === currentSection?._id && dragOverIndex === 0 ? 'bg-primary-400' : 'bg-transparent'"
                     @dragover.prevent="dragOverSectionId = currentSection!._id; dragOverIndex = 0"
-                    @dragleave="onDragLeave"
-                    @drop.prevent="onDropNewRow(currentSection!._id, 0, $event)"
-                  />
+                    @dragleave="onDragLeave" @drop.prevent="onDropNewRow(currentSection!._id, 0, $event)" />
 
                   <template v-for="(row, ri) in currentSection?.rows ?? []" :key="row._id">
                     <!-- Row block -->
-                    <div
-                      class="border rounded-xl overflow-hidden transition-all"
-                      :class="[
-                        selectedRowId === row._id ? 'border-primary-300 bg-primary-50/20' : 'border-gray-200 bg-gray-50/30',
-                        draggingRowId === row._id ? 'opacity-40' : '',
-                        dragOverRowId === row._id && draggingRowId !== row._id ? 'ring-2 ring-primary-400' : '',
-                      ]"
-                      @dragover.prevent="onRowDragOver(row._id, $event)"
-                      @dragleave="dragOverRowId = null"
-                      @drop.prevent="onRowDrop(currentSection!._id, ri, $event)"
-                    >
+                    <div class="border rounded-xl overflow-hidden transition-all" :class="[
+                      selectedRowId === row._id ? 'border-primary-300 bg-primary-50/20' : 'border-gray-200 bg-gray-50/30',
+                      draggingRowId === row._id ? 'opacity-40' : '',
+                      dragOverRowId === row._id && draggingRowId !== row._id ? 'ring-2 ring-primary-400' : '',
+                    ]" @dragover.prevent="onRowDragOver(row._id, $event)" @dragleave="dragOverRowId = null"
+                      @drop.prevent="onRowDrop(currentSection!._id, ri, $event)">
                       <!-- Row header -->
                       <div
                         class="flex items-center gap-2 px-3 py-1.5 border-b border-gray-100 bg-white/70 cursor-pointer select-none group"
-                        draggable="true"
-                        @click.stop="selectRow(row._id)"
-                        @dragstart="onRowDragStart(row._id, currentSection!._id, $event)"
-                        @dragend="onRowDragEnd"
-                      >
+                        draggable="true" @click.stop="selectRow(row._id)"
+                        @dragstart="onRowDragStart(row._id, currentSection!._id, $event)" @dragend="onRowDragEnd">
                         <UIcon name="i-heroicons-bars-2" class="size-4 text-gray-300 shrink-0 cursor-grab" />
                         <UBadge size="xs" :color="row.layout === 'auto' ? 'neutral' : 'primary'" variant="subtle">
-                          {{ row.layout === 'auto' ? 'Auto' : row.layout === 'flex' ? 'Flex' : `Grid ${row.cols ?? 2}` }}
+                          {{ row.layout === 'auto' ? 'Auto' : row.layout === 'flex' ? 'Flex' : `Grid ${row.cols ?? 2}`
+                          }}
                         </UBadge>
-                        <span class="text-xs text-gray-400 flex-1">{{ row.fields.length }} field{{ row.fields.length !== 1 ? 's' : '' }}</span>
-                        <UButton
-                          size="xs" variant="ghost" color="error" icon="i-heroicons-trash"
+                        <span class="text-xs text-gray-400 flex-1">{{ row.fields.length }} field{{ row.fields.length !==
+                          1 ? 's' : '' }}</span>
+                        <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-trash"
                           class="opacity-0 group-hover:opacity-100 transition-opacity"
-                          @click.stop="removeRow(currentSection!._id, row._id)"
-                        />
+                          @click.stop="removeRow(currentSection!._id, row._id)" />
                       </div>
 
                       <!-- Fields inside row — WYSIWYG grid -->
-                      <div
-                        class="p-2 grid grid-cols-12 gap-2 min-h-10"
+                      <div class="p-2 grid grid-cols-12 gap-2 min-h-10"
                         @dragover.prevent="dragOverSectionId = currentSection!._id; dragOverIndex = row.fields.length; dragOverRowId = row._id"
                         @dragleave="dragOverSectionId = null; dragOverIndex = null; dragOverRowId = null"
-                        @drop.prevent="onDropToRow(currentSection!._id, row._id, row.fields.length, $event)"
-                      >
-                        <div
-                          v-for="(field, fi) in row.fields"
-                          :key="field._id"
-                          class="relative group/field"
-                          :class="COL_SPAN_CLASS[field.colSpan ?? 12]"
-                          draggable="true"
+                        @drop.prevent="onDropToRow(currentSection!._id, row._id, row.fields.length, $event)">
+                        <div v-for="(field, fi) in row.fields" :key="field._id" class="relative group/field"
+                          :class="COL_SPAN_CLASS[field.colSpan ?? 12]" draggable="true"
                           @dragstart="onCanvasDragStart(field._id, currentSection!._id, $event)"
                           @dragover.prevent.stop="dragOverSectionId = currentSection!._id; dragOverIndex = fi; dragOverRowId = row._id"
-                          @drop.prevent.stop="onDropToRow(currentSection!._id, row._id, fi, $event)"
-                        >
+                          @drop.prevent.stop="onDropToRow(currentSection!._id, row._id, fi, $event)">
                           <!-- WYSIWYG field card -->
                           <div
                             class="h-full border rounded-xl overflow-hidden cursor-pointer transition-all select-none"
                             :class="selectedId === field._id
                               ? 'border-primary-400 shadow-sm ring-1 ring-primary-200'
                               : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'"
-                            @click.stop="selectField(field._id)"
-                          >
+                            @click.stop="selectField(field._id)">
                             <!-- Card toolbar -->
-                            <div class="flex items-center justify-between px-2.5 py-1 border-b bg-gray-50 border-gray-100">
+                            <div
+                              class="flex items-center justify-between px-2.5 py-1 border-b bg-gray-50 border-gray-100">
                               <div class="flex items-center gap-1.5 min-w-0">
                                 <UIcon name="i-heroicons-bars-2" class="size-3.5 text-gray-300 shrink-0 cursor-grab" />
                                 <span class="text-xs text-gray-400 font-mono truncate">{{ field.component }}</span>
-                                <UBadge v-if="field._group" color="primary" variant="subtle" size="xs">{{ field._group }}</UBadge>
-                                <UBadge v-if="duplicateNames.has(field.name)" color="warning" variant="subtle" size="xs">dup</UBadge>
+                                <UBadge v-if="field._group" color="primary" variant="subtle" size="xs">{{ field._group
+                                }}</UBadge>
+                                <UBadge v-if="duplicateNames.has(field.name)" color="warning" variant="subtle"
+                                  size="xs">dup</UBadge>
                               </div>
                               <div class="flex items-center gap-1 shrink-0">
                                 <span class="text-xs text-gray-300 font-mono">{{ field.colSpan ?? 12 }}/12</span>
@@ -653,7 +518,8 @@ const COL_SPAN_CLASS: Record<number, string> = {
                             </div>
 
                             <!-- Label + mock input -->
-                            <div class="px-3 py-2.5 space-y-1.5" :class="selectedId === field._id ? 'bg-primary-50' : 'bg-white'">
+                            <div class="px-3 py-2.5 space-y-1.5"
+                              :class="selectedId === field._id ? 'bg-primary-50' : 'bg-white'">
                               <div class="flex items-center gap-1">
                                 <span class="text-sm text-gray-700 leading-snug">{{ field.label || field.name }}</span>
                                 <span v-if="field.required" class="text-red-500 text-sm leading-none">*</span>
@@ -661,39 +527,44 @@ const COL_SPAN_CLASS: Record<number, string> = {
 
                               <!-- Text / Number / Textarea / AsyncSelect / Address / Calendar -->
                               <div
-                                v-if="['UInput','UTextarea','UAsyncSelect','UAddress','UCalendar','UTagInput','UOtpInput','UDateRange'].includes(field.component)"
-                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2"
-                              >
+                                v-if="['UInput', 'UTextarea', 'UAsyncSelect', 'UAddress', 'UCalendar', 'UTagInput', 'UOtpInput', 'UDateRange'].includes(field.component)"
+                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2">
                                 <span class="text-xs text-gray-300 truncate flex-1">{{ field.placeholder || "" }}</span>
-                                <UIcon v-if="field.component === 'UCalendar' || field.component === 'UDateRange'" name="i-heroicons-calendar-days" class="size-3.5 text-gray-300 shrink-0" />
-                                <UIcon v-else-if="['UAddress','UAsyncSelect'].includes(field.component)" name="i-heroicons-magnifying-glass" class="size-3.5 text-gray-300 shrink-0" />
+                                <UIcon v-if="field.component === 'UCalendar' || field.component === 'UDateRange'"
+                                  name="i-heroicons-calendar-days" class="size-3.5 text-gray-300 shrink-0" />
+                                <UIcon v-else-if="['UAddress', 'UAsyncSelect'].includes(field.component)"
+                                  name="i-heroicons-magnifying-glass" class="size-3.5 text-gray-300 shrink-0" />
                               </div>
 
                               <!-- Select / SelectMenu -->
-                              <div
-                                v-else-if="['USelect','USelectMenu'].includes(field.component)"
-                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 justify-between"
-                              >
+                              <div v-else-if="['USelect', 'USelectMenu'].includes(field.component)"
+                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 justify-between">
                                 <span class="text-xs text-gray-300">{{ field.placeholder || "" }}</span>
                                 <UIcon name="i-heroicons-chevron-up-down" class="size-3.5 text-gray-300" />
                               </div>
 
                               <!-- Radio -->
-                              <div v-else-if="field.component === 'URadioGroup'" class="flex items-center gap-3 py-0.5 flex-wrap">
-                                <div v-for="item in (field.items ?? []).slice(0, 3)" :key="item.value" class="flex items-center gap-1">
+                              <div v-else-if="field.component === 'URadioGroup'"
+                                class="flex items-center gap-3 py-0.5 flex-wrap">
+                                <div v-for="item in (field.items ?? []).slice(0, 3)" :key="item.value"
+                                  class="flex items-center gap-1">
                                   <div class="size-3 rounded-full border border-gray-300 bg-white shrink-0" />
                                   <span class="text-xs text-gray-400">{{ item.label }}</span>
                                 </div>
-                                <span v-if="!(field.items?.length)" class="text-xs text-gray-300 italic">No options</span>
+                                <span v-if="!(field.items?.length)" class="text-xs text-gray-300 italic">No
+                                  options</span>
                               </div>
 
                               <!-- Checkbox -->
-                              <div v-else-if="field.component === 'UCheckboxGroup'" class="flex items-center gap-3 py-0.5 flex-wrap">
-                                <div v-for="item in (field.items ?? []).slice(0, 3)" :key="item.value" class="flex items-center gap-1">
+                              <div v-else-if="field.component === 'UCheckboxGroup'"
+                                class="flex items-center gap-3 py-0.5 flex-wrap">
+                                <div v-for="item in (field.items ?? []).slice(0, 3)" :key="item.value"
+                                  class="flex items-center gap-1">
                                   <div class="size-3 rounded border border-gray-300 bg-white shrink-0" />
                                   <span class="text-xs text-gray-400">{{ item.label }}</span>
                                 </div>
-                                <span v-if="!(field.items?.length)" class="text-xs text-gray-300 italic">No options</span>
+                                <span v-if="!(field.items?.length)" class="text-xs text-gray-300 italic">No
+                                  options</span>
                               </div>
 
                               <!-- Switch -->
@@ -704,31 +575,32 @@ const COL_SPAN_CLASS: Record<number, string> = {
                               </div>
 
                               <!-- File -->
-                              <div
-                                v-else-if="['UFileInput','UFileUpload'].includes(field.component)"
-                                class="h-8 border-2 border-dashed border-gray-200 rounded-md bg-white flex items-center justify-center gap-1.5"
-                              >
+                              <div v-else-if="['UFileInput', 'UFileUpload'].includes(field.component)"
+                                class="h-8 border-2 border-dashed border-gray-200 rounded-md bg-white flex items-center justify-center gap-1.5">
                                 <UIcon name="i-heroicons-paper-clip" class="size-3.5 text-gray-300" />
                                 <span class="text-xs text-gray-300">Upload file</span>
                               </div>
 
                               <!-- Table / Repeater -->
-                              <div
-                                v-else-if="['UTableField','URepeater'].includes(field.component)"
-                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2"
-                              >
+                              <div v-else-if="['UTable', 'URepeater'].includes(field.component)"
+                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2">
                                 <UIcon name="i-heroicons-table-cells" class="size-3.5 text-gray-300 shrink-0" />
-                                <span class="text-xs text-gray-300">{{ field.component === 'UTableField' ? 'Table' : 'Repeater' }}</span>
+                                <span class="text-xs text-gray-300">{{ field.component === 'UTable' ? 'Table' :
+                                  'Repeater' }}</span>
                               </div>
-
                               <!-- Map Picker -->
-                              <div
-                                v-else-if="field.component === 'UMapPicker'"
-                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2"
-                              >
+                              <div v-else-if="field.component === 'UMapPicker'"
+                                class="h-8 border border-gray-200 rounded-md bg-white flex items-center px-3 gap-2">
                                 <UIcon name="i-heroicons-map-pin" class="size-3.5 text-gray-300 shrink-0" />
                                 <span class="text-xs text-gray-300 flex-1 truncate">No location selected</span>
                                 <UIcon name="i-heroicons-map" class="size-3.5 text-gray-300 shrink-0" />
+                              </div>
+
+                              <!-- CamDigiKey -->
+                              <div v-else-if="field.component === 'UCamDigiKey'"
+                                class="border border-blue-100 rounded-md bg-blue-50 px-3 py-1.5 flex items-center gap-2">
+                                <UIcon name="i-heroicons-identification" class="size-3.5 text-blue-400 shrink-0" />
+                                <span class="text-xs text-blue-400 font-medium">CamDigiKey</span>
                               </div>
                             </div>
                           </div>
@@ -737,20 +609,18 @@ const COL_SPAN_CLASS: Record<number, string> = {
                     </div>
 
                     <!-- Between-rows drop zone -->
-                    <div
-                      class="h-1.5 rounded-full transition-colors"
+                    <div class="h-1.5 rounded-full transition-colors"
                       :class="dragOverSectionId === currentSection?._id && dragOverIndex === ri + 1 && !dragOverRowId ? 'bg-primary-400' : 'bg-transparent'"
                       @dragover.prevent="dragOverSectionId = currentSection!._id; dragOverIndex = ri + 1; dragOverRowId = null"
-                      @dragleave="onDragLeave"
-                      @drop.prevent="onDropNewRow(currentSection!._id, ri + 1, $event)"
-                    />
+                      @dragleave="onDragLeave" @drop.prevent="onDropNewRow(currentSection!._id, ri + 1, $event)" />
                   </template>
 
                   <!-- Add Row button -->
                   <div class="pt-1">
-                    <UButton size="xs" variant="ghost" color="neutral" leading-icon="i-heroicons-plus" @click="addRow(currentSection!._id)">
+                    <UButton size="xs" variant="ghost" color="neutral" leading-icon="i-heroicons-plus"
+                      @click="addRow(currentSection!._id)">
                       <!-- Add Row -->
-                       Add Container
+                      Add Container
                     </UButton>
                   </div>
                 </template>
@@ -761,25 +631,16 @@ const COL_SPAN_CLASS: Record<number, string> = {
       </main>
 
       <!-- Right: config panel -->
-      <aside
-        class="w-72 bg-white border-l border-gray-200 overflow-y-auto shrink-0"
-        style="scrollbar-width: thin; scrollbar-color: #e5e7eb transparent"
-      >
+      <aside class="w-72 bg-white border-l border-gray-200 overflow-y-auto shrink-0"
+        style="scrollbar-width: thin; scrollbar-color: #e5e7eb transparent">
         <!-- Field config -->
-        <div
-          v-if="rightPanel === 'field' && selectedField"
-          class="p-4 space-y-4"
-        >
-          <p
-            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >
+        <div v-if="rightPanel === 'field' && selectedField" class="p-4 space-y-4">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Field Config
           </p>
 
-          <div
-            v-if="selectedField.component === 'UFullAddress'"
-            class="flex items-start gap-2 rounded-lg bg-primary-50 border border-primary-200 px-3 py-2.5 text-xs text-primary-700"
-          >
+          <div v-if="selectedField.component === 'UFullAddress'"
+            class="flex items-start gap-2 rounded-lg bg-primary-50 border border-primary-200 px-3 py-2.5 text-xs text-primary-700">
             <UIcon name="i-heroicons-map-pin" class="size-4 shrink-0 mt-0.5" />
             <div>
               <p class="font-medium">Full Address Field</p>
@@ -790,59 +651,33 @@ const COL_SPAN_CLASS: Record<number, string> = {
           </div>
 
           <UFormField label="Label">
-            <UInput
-              :model-value="selectedField.label"
-              placeholder="Field label"
-              size="sm"
-              @update:model-value="updateSelected({ label: $event as string })"
-            />
+            <UInput :model-value="selectedField.label" placeholder="Field label" size="sm"
+              @update:model-value="updateSelected({ label: $event as string })" />
           </UFormField>
           <UFormField label="Field name (key)">
-            <UInput
-              :model-value="selectedField.name"
-              placeholder="field_name"
-              size="sm"
-              @update:model-value="updateSelected({ name: $event as string })"
-            />
-            <p
-              v-if="duplicateNames.has(selectedField.name)"
-              class="text-xs text-orange-500 flex items-center gap-1 mt-1"
-            >
+            <UInput :model-value="selectedField.name" placeholder="field_name" size="sm"
+              @update:model-value="updateSelected({ name: $event as string })" />
+            <p v-if="duplicateNames.has(selectedField.name)"
+              class="text-xs text-orange-500 flex items-center gap-1 mt-1">
               <UIcon name="i-heroicons-exclamation-triangle" class="size-3.5" />
               Duplicate key — another field uses this name. Form values will
               conflict.
             </p>
           </UFormField>
           <UFormField label="Placeholder">
-            <UInput
-              :model-value="selectedField.placeholder"
-              placeholder="Hint text…"
-              size="sm"
-              @update:model-value="
-                updateSelected({ placeholder: $event as string })
-              "
-            />
+            <UInput :model-value="selectedField.placeholder" placeholder="Hint text…" size="sm" @update:model-value="
+              updateSelected({ placeholder: $event as string })
+              " />
           </UFormField>
           <UFormField label="Width" class="w-full col-span-full">
-            <USelect
-              class="w-[70%]"
-              :model-value="selectedField.colSpan ?? 12"
-              :items="colSpanOptions"
-              size="sm"
-              @update:model-value="updateSelected({ colSpan: Number($event) })"
-            />
+            <USelect class="w-[70%]" :model-value="selectedField.colSpan ?? 12" :items="colSpanOptions" size="sm"
+              @update:model-value="updateSelected({ colSpan: Number($event) })" />
           </UFormField>
-          <div
-            v-if="selectedField.component !== 'UFullAddress'"
-            class="flex items-center justify-between"
-          >
+          <div v-if="selectedField.component !== 'UFullAddress'" class="flex items-center justify-between">
             <span class="text-sm text-gray-700">Required</span>
-            <USwitch
-              :model-value="selectedField.required ?? false"
-              @update:model-value="
-                updateSelected({ required: $event as boolean })
-              "
-            />
+            <USwitch :model-value="selectedField.required ?? false" @update:model-value="
+              updateSelected({ required: $event as boolean })
+              " />
           </div>
 
           <!-- Validation rules -->
@@ -852,76 +687,41 @@ const COL_SPAN_CLASS: Record<number, string> = {
                 <p class="text-sm font-medium text-gray-700">
                   Validation Rules
                 </p>
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  leading-icon="i-heroicons-plus"
-                  @click="addRule(selectedField)"
-                  >Add</UButton
-                >
+                <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" @click="addRule(selectedField)">Add
+                </UButton>
               </div>
-              <div
-                v-if="!selectedField.validation?.length"
-                class="text-xs text-gray-400 italic px-1"
-              >
+              <div v-if="!selectedField.validation?.length" class="text-xs text-gray-400 italic px-1">
                 No rules — use Required toggle for basic check.
               </div>
               <div class="space-y-3">
-                <div
-                  v-for="(rule, idx) in selectedField.validation ?? []"
-                  :key="idx"
-                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
-                >
+                <div v-for="(rule, idx) in selectedField.validation ?? []" :key="idx"
+                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2">
                   <div class="flex items-center gap-1.5">
-                    <USelect
-                      :model-value="rule.type"
-                      :items="ruleTypeOptions"
-                      size="xs"
-                      class="flex-1"
+                    <USelect :model-value="rule.type" :items="ruleTypeOptions" size="xs" class="flex-1"
                       @update:model-value="
                         updateRule(selectedField, idx, { type: $event as any })
-                      "
-                    />
-                    <UButton
-                      size="xs"
-                      variant="ghost"
-                      color="error"
-                      icon="i-heroicons-x-mark"
-                      @click="removeRule(selectedField, idx)"
-                    />
+                        " />
+                    <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark"
+                      @click="removeRule(selectedField, idx)" />
                   </div>
-                  <UInput
-                    v-if="ruleNeedsValue.includes(rule.type)"
-                    :model-value="rule.value"
-                    :placeholder="
-                      rule.type === 'regex' ? 'e.g. ^[A-Z]+$' : 'e.g. 3'
-                    "
-                    size="xs"
-                    @update:model-value="
+                  <UInput v-if="ruleNeedsValue.includes(rule.type)" :model-value="rule.value" :placeholder="rule.type === 'regex' ? 'e.g. ^[A-Z]+$' : 'e.g. 3'
+                    " size="xs" @update:model-value="
                       updateRule(selectedField, idx, {
                         value: $event as string,
                       })
-                    "
-                  />
-                  <UInput
-                    :model-value="rule.message"
-                    placeholder="Error message"
-                    size="xs"
-                    @update:model-value="
-                      updateRule(selectedField, idx, {
-                        message: $event as string,
-                      })
-                    "
-                  />
+                      " />
+                  <UInput :model-value="rule.message" placeholder="Error message" size="xs" @update:model-value="
+                    updateRule(selectedField, idx, {
+                      message: $event as string,
+                    })
+                    " />
                 </div>
               </div>
             </div>
           </template>
 
           <!-- Required message -->
-          <template
-            v-if="supportsRequiredMessage.includes(selectedField.component)"
-          >
+          <template v-if="supportsRequiredMessage.includes(selectedField.component)">
             <div class="space-y-1.5">
               <p class="text-sm font-medium text-gray-700">
                 Required Error Message
@@ -929,14 +729,10 @@ const COL_SPAN_CLASS: Record<number, string> = {
               <p class="text-xs text-gray-400">
                 Leave blank to disable validation.
               </p>
-              <UInput
-                :model-value="getAddressRequiredMessage(selectedField)"
-                placeholder="e.g. Please select a province"
-                size="sm"
-                @update:model-value="
+              <UInput :model-value="getAddressRequiredMessage(selectedField)"
+                placeholder="e.g. Please select a province" size="sm" @update:model-value="
                   setAddressRequiredMessage($event as string)
-                "
-              />
+                  " />
             </div>
           </template>
 
@@ -947,10 +743,7 @@ const COL_SPAN_CLASS: Record<number, string> = {
                 Async Search Config
               </p>
               <UFormField label="API Endpoint">
-                <UInput
-                  :model-value="selectedField.props?.apiEndpoint ?? ''"
-                  placeholder="/api/search"
-                  size="sm"
+                <UInput :model-value="selectedField.props?.apiEndpoint ?? ''" placeholder="/api/search" size="sm"
                   @update:model-value="
                     updateSelected({
                       props: {
@@ -958,14 +751,10 @@ const COL_SPAN_CLASS: Record<number, string> = {
                         apiEndpoint: $event as string,
                       },
                     })
-                  "
-                />
+                    " />
               </UFormField>
               <UFormField label="Search Param">
-                <UInput
-                  :model-value="selectedField.props?.searchParam ?? 'q'"
-                  placeholder="q"
-                  size="sm"
+                <UInput :model-value="selectedField.props?.searchParam ?? 'q'" placeholder="q" size="sm"
                   @update:model-value="
                     updateSelected({
                       props: {
@@ -973,30 +762,20 @@ const COL_SPAN_CLASS: Record<number, string> = {
                         searchParam: $event as string,
                       },
                     })
-                  "
-                />
+                    " />
               </UFormField>
               <UFormField label="Min Chars to Search">
-                <UInputNumber
-                  :model-value="selectedField.props?.minChars ?? 2"
-                  :min="0"
-                  size="sm"
-                  @update:model-value="
-                    updateSelected({
-                      props: {
-                        ...selectedField.props,
-                        minChars: Number($event),
-                      },
-                    })
-                  "
-                />
+                <UInputNumber :model-value="selectedField.props?.minChars ?? 2" :min="0" size="sm" @update:model-value="
+                  updateSelected({
+                    props: {
+                      ...selectedField.props,
+                      minChars: Number($event),
+                    },
+                  })
+                  " />
               </UFormField>
               <UFormField label="Debounce (ms)">
-                <UInputNumber
-                  :model-value="selectedField.props?.debounce ?? 300"
-                  :min="0"
-                  :step="50"
-                  size="sm"
+                <UInputNumber :model-value="selectedField.props?.debounce ?? 300" :min="0" :step="50" size="sm"
                   @update:model-value="
                     updateSelected({
                       props: {
@@ -1004,24 +783,18 @@ const COL_SPAN_CLASS: Record<number, string> = {
                         debounce: Number($event),
                       },
                     })
-                  "
-                />
+                    " />
               </UFormField>
               <UFormField label="No Results Text">
-                <UInput
-                  :model-value="
-                    selectedField.props?.noResultsText ?? 'No results found'
-                  "
-                  size="sm"
-                  @update:model-value="
+                <UInput :model-value="selectedField.props?.noResultsText ?? 'No results found'
+                  " size="sm" @update:model-value="
                     updateSelected({
                       props: {
                         ...selectedField.props,
                         noResultsText: $event as string,
                       },
                     })
-                  "
-                />
+                    " />
               </UFormField>
             </div>
           </template>
@@ -1031,45 +804,19 @@ const COL_SPAN_CLASS: Record<number, string> = {
             <div>
               <div class="flex items-center justify-between mb-2">
                 <p class="text-sm font-medium text-gray-700">Options</p>
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  leading-icon="i-heroicons-plus"
-                  @click="addItem(selectedField)"
-                  >Add</UButton
-                >
+                <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" @click="addItem(selectedField)">Add
+                </UButton>
               </div>
               <div class="space-y-2">
-                <div
-                  v-for="(item, idx) in selectedField.items ?? []"
-                  :key="idx"
-                  class="flex items-center gap-1.5"
-                >
-                  <UInput
-                    :model-value="item.label"
-                    placeholder="Label"
-                    size="xs"
-                    class="flex-1"
-                    @update:model-value="
-                      updateItem(selectedField, idx, 'label', $event as string)
-                    "
-                  />
-                  <UInput
-                    :model-value="item.value"
-                    placeholder="Value"
-                    size="xs"
-                    class="flex-1"
-                    @update:model-value="
-                      updateItem(selectedField, idx, 'value', $event as string)
-                    "
-                  />
-                  <UButton
-                    size="xs"
-                    variant="ghost"
-                    color="error"
-                    icon="i-heroicons-x-mark"
-                    @click="removeItem(selectedField, idx)"
-                  />
+                <div v-for="(item, idx) in selectedField.items ?? []" :key="idx" class="flex items-center gap-1.5">
+                  <UInput :model-value="item.label" placeholder="Label" size="xs" class="flex-1" @update:model-value="
+                    updateItem(selectedField, idx, 'label', $event as string)
+                    " />
+                  <UInput :model-value="item.value" placeholder="Value" size="xs" class="flex-1" @update:model-value="
+                    updateItem(selectedField, idx, 'value', $event as string)
+                    " />
+                  <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark"
+                    @click="removeItem(selectedField, idx)" />
                 </div>
               </div>
             </div>
@@ -1080,79 +827,38 @@ const COL_SPAN_CLASS: Record<number, string> = {
             <div>
               <div class="flex items-center justify-between mb-2">
                 <p class="text-sm font-medium text-gray-700">Columns</p>
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  leading-icon="i-heroicons-plus"
-                  type="button"
-                  @click="addTableColumn(selectedField)"
-                  >Add</UButton
-                >
+                <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" type="button"
+                  @click="addTableColumn(selectedField)">Add</UButton>
               </div>
               <div class="space-y-3">
-                <div
-                  v-for="(col, ci) in selectedField.props?.columns ?? []"
-                  :key="ci"
-                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
-                >
+                <div v-for="(col, ci) in selectedField.props?.columns ?? []" :key="ci"
+                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2">
                   <div class="flex items-center gap-1.5">
-                    <UInput
-                      :model-value="col.label"
-                      placeholder="Label"
-                      size="xs"
-                      class="flex-1"
-                      @update:model-value="
-                        updateTableColumn(selectedField, Number(ci), {
-                          label: $event as string,
-                        })
-                      "
-                    />
-                    <UButton
-                      size="xs"
-                      variant="ghost"
-                      color="error"
-                      icon="i-heroicons-x-mark"
-                      type="button"
-                      @click="removeTableColumn(selectedField, Number(ci))"
-                    />
+                    <UInput :model-value="col.label" placeholder="Label" size="xs" class="flex-1" @update:model-value="
+                      updateTableColumn(selectedField, Number(ci), {
+                        label: $event as string,
+                      })
+                      " />
+                    <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark" type="button"
+                      @click="removeTableColumn(selectedField, Number(ci))" />
                   </div>
                   <div class="flex gap-1.5">
-                    <UInput
-                      :model-value="col.key"
-                      placeholder="key"
-                      size="xs"
-                      class="flex-1"
-                      @update:model-value="
-                        updateTableColumn(selectedField, Number(ci), {
-                          key: $event as string,
-                        })
-                      "
-                    />
-                    <USelect
-                      :model-value="col.type"
-                      :items="colTypeOptions"
-                      size="xs"
-                      class="w-24"
-                      @update:model-value="
-                        updateTableColumn(selectedField, Number(ci), {
-                          type: $event as string,
-                        })
-                      "
-                    />
+                    <UInput :model-value="col.key" placeholder="key" size="xs" class="flex-1" @update:model-value="
+                      updateTableColumn(selectedField, Number(ci), {
+                        key: $event as string,
+                      })
+                      " />
+                    <USelect :model-value="col.type" :items="colTypeOptions" size="xs" class="w-24" @update:model-value="
+                      updateTableColumn(selectedField, Number(ci), {
+                        type: $event as string,
+                      })
+                      " />
                   </div>
                   <!-- select column options -->
                   <template v-if="col.type === 'select'">
                     <div class="space-y-1.5 pl-1 border-l-2 border-gray-200">
-                      <div
-                        v-for="(opt, oi) in col.options ?? []"
-                        :key="oi"
-                        class="flex items-center gap-1"
-                      >
-                        <UInput
-                          :model-value="opt.label"
-                          placeholder="Label"
-                          size="xs"
-                          class="flex-1"
+                      <div v-for="(opt, oi) in col.options ?? []" :key="oi" class="flex items-center gap-1">
+                        <UInput :model-value="opt.label" placeholder="Label" size="xs" class="flex-1"
                           @update:model-value="
                             updateTableColOption(
                               selectedField,
@@ -1161,13 +867,8 @@ const COL_SPAN_CLASS: Record<number, string> = {
                               'label',
                               $event as string,
                             )
-                          "
-                        />
-                        <UInput
-                          :model-value="opt.value"
-                          placeholder="Value"
-                          size="xs"
-                          class="flex-1"
+                            " />
+                        <UInput :model-value="opt.value" placeholder="Value" size="xs" class="flex-1"
                           @update:model-value="
                             updateTableColOption(
                               selectedField,
@@ -1176,25 +877,12 @@ const COL_SPAN_CLASS: Record<number, string> = {
                               'value',
                               $event as string,
                             )
-                          "
-                        />
-                        <UButton
-                          size="xs"
-                          variant="ghost"
-                          color="error"
-                          icon="i-heroicons-x-mark"
-                          type="button"
-                          @click="removeTableColOption(selectedField, Number(ci), Number(oi))"
-                        />
+                            " />
+                        <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark" type="button"
+                          @click="removeTableColOption(selectedField, Number(ci), Number(oi))" />
                       </div>
-                      <UButton
-                        size="xs"
-                        variant="ghost"
-                        leading-icon="i-heroicons-plus"
-                        type="button"
-                        @click="addTableColOption(selectedField, Number(ci))"
-                        >Option</UButton
-                      >
+                      <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" type="button"
+                        @click="addTableColOption(selectedField, Number(ci))">Option</UButton>
                     </div>
                   </template>
                 </div>
@@ -1206,27 +894,17 @@ const COL_SPAN_CLASS: Record<number, string> = {
           <template v-if="selectedField.component === 'UOtpInput'">
             <UFormField label="PIN Length">
               <UButtonGroup size="sm">
-                <UButton
-                  v-for="n in [4, 5, 6]"
-                  :key="n"
-                  type="button"
-                  :variant="
-                    (selectedField.props?.length ?? 6) === n
-                      ? 'solid'
-                      : 'outline'
-                  "
-                  :color="
-                    (selectedField.props?.length ?? 6) === n
-                      ? 'primary'
-                      : 'neutral'
-                  "
-                  @click="
-                    updateSelected({
-                      props: { ...selectedField.props, length: n },
-                    })
-                  "
-                  >{{ n }} digits</UButton
-                >
+                <UButton v-for="n in [4, 5, 6]" :key="n" type="button" :variant="(selectedField.props?.length ?? 6) === n
+                  ? 'solid'
+                  : 'outline'
+                  " :color="(selectedField.props?.length ?? 6) === n
+                    ? 'primary'
+                    : 'neutral'
+                    " @click="
+                      updateSelected({
+                        props: { ...selectedField.props, length: n },
+                      })
+                      ">{{ n }} digits</UButton>
               </UButtonGroup>
             </UFormField>
           </template>
@@ -1236,78 +914,37 @@ const COL_SPAN_CLASS: Record<number, string> = {
             <div>
               <div class="flex items-center justify-between mb-2">
                 <p class="text-sm font-medium text-gray-700">Sub-fields</p>
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  leading-icon="i-heroicons-plus"
-                  type="button"
-                  @click="addRepeaterField(selectedField)"
-                  >Add</UButton
-                >
+                <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" type="button"
+                  @click="addRepeaterField(selectedField)">Add</UButton>
               </div>
               <div class="space-y-3">
-                <div
-                  v-for="(col, ci) in selectedField.props?.fields ?? []"
-                  :key="ci"
-                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
-                >
+                <div v-for="(col, ci) in selectedField.props?.fields ?? []" :key="ci"
+                  class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2">
                   <div class="flex items-center gap-1.5">
-                    <UInput
-                      :model-value="col.label"
-                      placeholder="Label"
-                      size="xs"
-                      class="flex-1"
-                      @update:model-value="
-                        updateRepeaterField(selectedField, Number(ci), {
-                          label: $event as string,
-                        })
-                      "
-                    />
-                    <UButton
-                      size="xs"
-                      variant="ghost"
-                      color="error"
-                      icon="i-heroicons-x-mark"
-                      type="button"
-                      @click="removeRepeaterField(selectedField, Number(ci))"
-                    />
+                    <UInput :model-value="col.label" placeholder="Label" size="xs" class="flex-1" @update:model-value="
+                      updateRepeaterField(selectedField, Number(ci), {
+                        label: $event as string,
+                      })
+                      " />
+                    <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark" type="button"
+                      @click="removeRepeaterField(selectedField, Number(ci))" />
                   </div>
                   <div class="flex gap-1.5">
-                    <UInput
-                      :model-value="col.key"
-                      placeholder="key"
-                      size="xs"
-                      class="flex-1"
-                      @update:model-value="
-                        updateRepeaterField(selectedField, Number(ci), {
-                          key: $event as string,
-                        })
-                      "
-                    />
-                    <USelect
-                      :model-value="col.type"
-                      :items="colTypeOptions"
-                      size="xs"
-                      class="w-24"
-                      @update:model-value="
-                        updateRepeaterField(selectedField, Number(ci), {
-                          type: $event as string,
-                        })
-                      "
-                    />
+                    <UInput :model-value="col.key" placeholder="key" size="xs" class="flex-1" @update:model-value="
+                      updateRepeaterField(selectedField, Number(ci), {
+                        key: $event as string,
+                      })
+                      " />
+                    <USelect :model-value="col.type" :items="colTypeOptions" size="xs" class="w-24" @update:model-value="
+                      updateRepeaterField(selectedField, Number(ci), {
+                        type: $event as string,
+                      })
+                      " />
                   </div>
                   <template v-if="col.type === 'select'">
                     <div class="space-y-1.5 pl-1 border-l-2 border-gray-200">
-                      <div
-                        v-for="(opt, oi) in col.options ?? []"
-                        :key="oi"
-                        class="flex items-center gap-1"
-                      >
-                        <UInput
-                          :model-value="opt.label"
-                          placeholder="Label"
-                          size="xs"
-                          class="flex-1"
+                      <div v-for="(opt, oi) in col.options ?? []" :key="oi" class="flex items-center gap-1">
+                        <UInput :model-value="opt.label" placeholder="Label" size="xs" class="flex-1"
                           @update:model-value="
                             updateRepeaterFieldOption(
                               selectedField,
@@ -1316,13 +953,8 @@ const COL_SPAN_CLASS: Record<number, string> = {
                               'label',
                               $event as string,
                             )
-                          "
-                        />
-                        <UInput
-                          :model-value="opt.value"
-                          placeholder="Value"
-                          size="xs"
-                          class="flex-1"
+                            " />
+                        <UInput :model-value="opt.value" placeholder="Value" size="xs" class="flex-1"
                           @update:model-value="
                             updateRepeaterFieldOption(
                               selectedField,
@@ -1331,27 +963,13 @@ const COL_SPAN_CLASS: Record<number, string> = {
                               'value',
                               $event as string,
                             )
-                          "
-                        />
-                        <UButton
-                          size="xs"
-                          variant="ghost"
-                          color="error"
-                          icon="i-heroicons-x-mark"
-                          type="button"
-                          @click="
-                            removeRepeaterFieldOption(selectedField, Number(ci), Number(oi))
-                          "
-                        />
+                            " />
+                        <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-x-mark" type="button" @click="
+                          removeRepeaterFieldOption(selectedField, Number(ci), Number(oi))
+                          " />
                       </div>
-                      <UButton
-                        size="xs"
-                        variant="ghost"
-                        leading-icon="i-heroicons-plus"
-                        type="button"
-                        @click="addRepeaterFieldOption(selectedField, Number(ci))"
-                        >Option</UButton
-                      >
+                      <UButton size="xs" variant="ghost" leading-icon="i-heroicons-plus" type="button"
+                        @click="addRepeaterFieldOption(selectedField, Number(ci))">Option</UButton>
                     </div>
                   </template>
                 </div>
@@ -1363,193 +981,108 @@ const COL_SPAN_CLASS: Record<number, string> = {
           <template v-if="selectedField.component === 'UFullAddress'">
             <div class="space-y-3">
               <p class="text-sm font-medium text-gray-700">Address Levels</p>
-              <div
-                v-for="level in ADDRESS_LEVELS"
-                :key="level"
-                class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2"
-              >
+              <div v-for="level in ADDRESS_LEVELS" :key="level"
+                class="rounded-lg border border-gray-100 bg-gray-50 p-2.5 space-y-2">
                 <p class="text-xs font-semibold text-gray-500">
                   {{ addressLevelLabels[level] }}
                 </p>
                 <UFormField label="Label">
-                  <UInput
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.label ?? ''
-                    "
-                    placeholder="Label"
-                    size="xs"
-                    @update:model-value="
+                  <UInput :model-value="selectedField.props?.subFields?.[level]?.label ?? ''
+                    " placeholder="Label" size="xs" @update:model-value="
                       updateFullAddressSubField(selectedField, level, {
                         label: $event as string,
                       })
-                    "
-                  />
+                      " />
                 </UFormField>
                 <UFormField label="Placeholder">
-                  <UInput
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.placeholder ?? ''
-                    "
-                    placeholder="Placeholder"
-                    size="xs"
-                    @update:model-value="
+                  <UInput :model-value="selectedField.props?.subFields?.[level]?.placeholder ?? ''
+                    " placeholder="Placeholder" size="xs" @update:model-value="
                       updateFullAddressSubField(selectedField, level, {
                         placeholder: $event as string,
                       })
-                    "
-                  />
+                      " />
                 </UFormField>
                 <UFormField label="API Endpoint">
-                  <UInput
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.apiEndpoint ?? ''
-                    "
-                    placeholder="/api/address/..."
-                    size="xs"
-                    @update:model-value="
+                  <UInput :model-value="selectedField.props?.subFields?.[level]?.apiEndpoint ?? ''
+                    " placeholder="/api/address/..." size="xs" @update:model-value="
                       updateFullAddressSubField(selectedField, level, {
                         apiEndpoint: $event as string,
                       })
-                    "
-                  />
+                      " />
                 </UFormField>
                 <UFormField label="Width">
-                  <USelect
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.colSpan ?? 6
-                    "
-                    :items="colSpanOptions"
-                    size="xs"
-                    @update:model-value="
+                  <USelect :model-value="selectedField.props?.subFields?.[level]?.colSpan ?? 6
+                    " :items="colSpanOptions" size="xs" @update:model-value="
                       updateFullAddressSubField(selectedField, level, {
                         colSpan: Number($event),
                       })
-                    "
-                  />
+                      " />
                 </UFormField>
                 <div class="flex items-center justify-between">
                   <span class="text-xs text-gray-600">Required</span>
-                  <USwitch
-                    :model-value="
-                      selectedField.props?.subFields?.[level]?.required ?? false
-                    "
-                    size="xs"
-                    @update:model-value="
+                  <USwitch :model-value="selectedField.props?.subFields?.[level]?.required ?? false
+                    " size="xs" @update:model-value="
                       updateFullAddressSubField(selectedField, level, {
                         required: $event as boolean,
                       })
-                    "
-                  />
+                      " />
                 </div>
               </div>
             </div>
           </template>
 
-          <UButton
-            block
-            variant="soft"
-            color="error"
-            leading-icon="i-heroicons-trash"
-            size="sm"
-            @click="removeField(selectedField._id)"
-            >Remove Field</UButton
-          >
+          <UButton block variant="soft" color="error" leading-icon="i-heroicons-trash" size="sm"
+            @click="removeField(selectedField._id)">Remove Field</UButton>
         </div>
 
         <!-- Section config -->
-        <div
-          v-else-if="rightPanel === 'section' && currentSection"
-          class="p-4 space-y-4"
-        >
-          <p
-            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >
+        <div v-else-if="rightPanel === 'section' && currentSection" class="p-4 space-y-4">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Section Config
           </p>
           <UFormField label="Section Title">
-            <UInput
-              v-model="currentSection.title"
-              placeholder="e.g. Personal Info"
-              size="sm"
-            />
+            <UInput v-model="currentSection.title" placeholder="e.g. Personal Info" size="sm" />
           </UFormField>
           <UFormField label="Description">
-            <UInput
-              v-model="currentSection.description"
-              placeholder="Optional description"
-              size="sm"
-            />
+            <UInput v-model="currentSection.description" placeholder="Optional description" size="sm" />
           </UFormField>
           <UFormField label="Icon (Heroicons)">
-            <UInput
-              v-model="currentSection.icon"
-              placeholder="i-heroicons-user"
-              size="sm"
-            />
+            <UInput v-model="currentSection.icon" placeholder="i-heroicons-user" size="sm" />
           </UFormField>
           <UFormField label="Display Style">
             <UButtonGroup size="sm">
-              <UButton
-                v-for="opt in sectionStyleOptions"
-                :key="opt.value"
-                type="button"
-                :variant="
-                  (currentSection.displayStyle ?? 'card') === opt.value
-                    ? 'solid'
-                    : 'outline'
-                "
-                :color="
-                  (currentSection.displayStyle ?? 'card') === opt.value
-                    ? 'primary'
-                    : 'neutral'
-                "
-                @click="
-                  currentSection.displayStyle = opt.value as
+              <UButton v-for="opt in sectionStyleOptions" :key="opt.value" type="button" :variant="(currentSection.displayStyle ?? 'card') === opt.value
+                ? 'solid'
+                : 'outline'
+                " :color="(currentSection.displayStyle ?? 'card') === opt.value
+                  ? 'primary'
+                  : 'neutral'
+                  " @click="
+                    currentSection.displayStyle = opt.value as
                     | 'card'
                     | 'collapse'
                     | 'plain'
-                "
-                >{{ opt.label }}</UButton
-              >
+                    ">{{ opt.label }}</UButton>
             </UButtonGroup>
           </UFormField>
         </div>
 
         <!-- Page config -->
-        <div
-          v-else-if="rightPanel === 'page' && currentPage"
-          class="p-4 space-y-4"
-        >
-          <p
-            class="text-xs font-semibold text-gray-400 uppercase tracking-wider"
-          >
+        <div v-else-if="rightPanel === 'page' && currentPage" class="p-4 space-y-4">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">
             Step Config
           </p>
           <UFormField label="Step Title">
-            <UInput
-              v-model="currentPage.title"
-              placeholder="e.g. Personal Info"
-              size="sm"
-            />
+            <UInput v-model="currentPage.title" placeholder="e.g. Personal Info" size="sm" />
           </UFormField>
           <UFormField label="Description">
-            <UInput
-              v-model="currentPage.description"
-              placeholder="Optional description"
-              size="sm"
-            />
+            <UInput v-model="currentPage.description" placeholder="Optional description" size="sm" />
           </UFormField>
         </div>
 
         <!-- Empty -->
-        <div
-          v-else
-          class="flex flex-col items-center justify-center h-full py-16 text-center px-6"
-        >
-          <UIcon
-            name="i-heroicons-cursor-arrow-rays"
-            class="size-8 text-gray-200 mb-3"
-          />
+        <div v-else class="flex flex-col items-center justify-center h-full py-16 text-center px-6">
+          <UIcon name="i-heroicons-cursor-arrow-rays" class="size-8 text-gray-200 mb-3" />
           <p class="text-sm text-gray-400">
             Click a field, section, or step to configure it
           </p>
@@ -1560,61 +1093,40 @@ const COL_SPAN_CLASS: Record<number, string> = {
     <!-- Preview modal -->
     <UModal v-model:open="showPreview" class="max-w-2xl">
       <template #content>
-        <UCard
-          class="flex flex-col max-h-[90vh]"
-          :ui="{ body: 'overflow-y-auto flex-1 min-h-0' }"
-        >
+        <UCard class="flex flex-col max-h-[90vh]" :ui="{ body: 'overflow-y-auto flex-1 min-h-0' }">
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="font-semibold text-gray-900">
                 Preview: {{ formTitle }}
               </h3>
-              <UButton
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                icon="i-heroicons-x-mark"
-                @click="showPreview = false"
-              />
+              <UButton variant="ghost" color="neutral" size="sm" icon="i-heroicons-x-mark"
+                @click="showPreview = false" />
             </div>
           </template>
           <div v-if="previewConfig" :key="previewKey">
             <!-- single-page with sections → wizard handles section layout -->
-            <template
-              v-if="
-                previewConfig.pages.length === 1 &&
-                previewConfig.pages[0].sections
-              "
-            >
-              <V2WizardRenderer
-                :config="previewConfig"
-                @submit="
-                  (d) => {
-                    console.log('Preview:', d);
-                    showPreview = false;
-                  }
-                "
-              />
+            <template v-if="
+              previewConfig.pages.length === 1 &&
+              previewConfig.pages[0].sections
+            ">
+              <V2WizardRenderer :config="previewConfig" @submit="
+                (d) => {
+                  console.log('Preview:', d);
+                  showPreview = false;
+                }
+              " />
             </template>
             <!-- single-page flat fields → simple renderer -->
             <template v-else-if="previewConfig.pages.length === 1">
-              <V2FormRenderer
-                :fields="previewConfig.pages[0].fields ?? []"
-                @submit="
-                  (d) => {
-                    console.log('Preview:', d);
-                    showPreview = false;
-                  }
-                "
-              >
+              <V2FormRenderer :fields="previewConfig.pages[0].fields ?? []" @submit="
+                (d) => {
+                  console.log('Preview:', d);
+                  showPreview = false;
+                }
+              ">
                 <template #actions>
                   <div class="flex justify-end pt-2 gap-2">
-                    <UButton
-                      variant="ghost"
-                      color="neutral"
-                      @click="showPreview = false"
-                      >Close</UButton
-                    >
+                    <UButton variant="ghost" color="neutral" @click="showPreview = false">Close</UButton>
                     <UButton type="submit">Submit</UButton>
                   </div>
                 </template>
@@ -1622,15 +1134,12 @@ const COL_SPAN_CLASS: Record<number, string> = {
             </template>
             <!-- multi-page wizard -->
             <template v-else>
-              <V2WizardRenderer
-                :config="previewConfig"
-                @submit="
-                  (d: Record<string, any>) => {
-                    console.log('Preview:', d);
-                    showPreview = false;
-                  }
-                "
-              />
+              <V2WizardRenderer :config="previewConfig" @submit="
+                (d: Record<string, any>) => {
+                  console.log('Preview:', d);
+                  showPreview = false;
+                }
+              " />
             </template>
           </div>
           <div v-else class="py-8 text-center text-gray-400">
@@ -1647,27 +1156,15 @@ const COL_SPAN_CLASS: Record<number, string> = {
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="font-semibold text-gray-900">Saved Forms</h3>
-              <UButton
-                variant="ghost"
-                color="neutral"
-                size="sm"
-                icon="i-heroicons-x-mark"
-                @click="showLoad = false"
-              />
+              <UButton variant="ghost" color="neutral" size="sm" icon="i-heroicons-x-mark" @click="showLoad = false" />
             </div>
           </template>
-          <div
-            v-if="savedForms.length === 0"
-            class="py-8 text-center text-gray-400"
-          >
+          <div v-if="savedForms.length === 0" class="py-8 text-center text-gray-400">
             No saved forms yet.
           </div>
           <div v-else class="space-y-2">
-            <div
-              v-for="form in savedForms"
-              :key="form.id"
-              class="flex items-center justify-between px-3 py-2.5 border border-gray-100 rounded-lg hover:bg-gray-50"
-            >
+            <div v-for="form in savedForms" :key="form.id"
+              class="flex items-center justify-between px-3 py-2.5 border border-gray-100 rounded-lg hover:bg-gray-50">
               <div>
                 <p class="text-sm font-medium text-gray-900">{{ form.name }}</p>
                 <p class="text-xs text-gray-400">
@@ -1675,27 +1172,19 @@ const COL_SPAN_CLASS: Record<number, string> = {
                 </p>
               </div>
               <div class="flex items-center gap-1">
-                <UButton size="xs" variant="outline" @click="loadSaved(form.id)"
-                  >Load</UButton
-                >
-                <UButton
-                  size="xs"
-                  variant="ghost"
-                  color="error"
-                  icon="i-heroicons-trash"
-                  @click="
-                    modal.openConfirm({
-                      title: 'Delete Form',
-                      description: `'${form.name}' will be permanently deleted.`,
-                      icon: 'i-heroicons-trash',
-                      confirmLabel: 'Delete',
-                      onConfirm: () => {
-                        deleteForm(form.id);
-                        refresh();
-                      },
-                    })
-                  "
-                />
+                <UButton size="xs" variant="outline" @click="loadSaved(form.id)">Load</UButton>
+                <UButton size="xs" variant="ghost" color="error" icon="i-heroicons-trash" @click="
+                  modal.openConfirm({
+                    title: 'Delete Form',
+                    description: `'${form.name}' will be permanently deleted.`,
+                    icon: 'i-heroicons-trash',
+                    confirmLabel: 'Delete',
+                    onConfirm: () => {
+                      deleteForm(form.id);
+                      refresh();
+                    },
+                  })
+                  " />
               </div>
             </div>
           </div>

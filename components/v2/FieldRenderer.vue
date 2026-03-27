@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { FieldWithConditions } from "~/types/form-builder";
 import { resolveComponentMap } from "~/utils/ui-helper";
+import BaseCamDigiKey from "~/components/base/camdigikey.vue";
 
 interface Props {
   field: FieldWithConditions;
@@ -46,138 +47,68 @@ function fieldProps() {
 </script>
 
 <template>
-  <UFormField
-    :name="field.name"
-    :label="field.label"
-    :description="field.description"
-    :required="field.required"
-  >
+  <UFormField :name="field.name" :label="field.label" :description="field.description" :required="field.required">
     <!-- date picker -->
-    <BaseDatePicker
-      v-if="field.component === 'UCalendar'"
-      :field="field"
-      :model-value="value"
-      @update:model-value="value = $event"
-    />
+    <BaseDatePicker v-if="field.component === 'UCalendar'" :field="field" :model-value="value"
+      @update:model-value="value = $event" />
 
     <!-- full address group -->
-    <BaseFullAddress
-      v-else-if="field.component === 'UFullAddress'"
-      :field="field"
-      :model-value="value"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseFullAddress v-else-if="field.component === 'UFullAddress'" :field="field" :model-value="value"
+      :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- map picker -->
-    <BaseMapPicker
-      v-else-if="field.component === 'UMapPicker'"
-      :field="field"
-      :model-value="value"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseMapPicker v-else-if="field.component === 'UMapPicker'" :field="field" :model-value="value" :disabled="disabled"
+      @update:model-value="value = $event" />
 
     <!-- cascading address -->
-    <BaseAddress
-      v-else-if="field.component === 'UAddress'"
-      :field="field"
-      :model-value="value"
-      :form-values="formValues"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseAddress v-else-if="field.component === 'UAddress'" :field="field" :model-value="value"
+      :form-values="formValues" :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- async searchable select -->
-    <BaseAsynSelect
-      v-else-if="field.component === 'UAsyncSelect'"
-      :field="field"
-      :model-value="value"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseAsynSelect v-else-if="field.component === 'UAsyncSelect'" :field="field" :model-value="value"
+      :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- switch / toggle -->
-    <USwitch
-      v-else-if="field.component === 'USwitch'"
-      v-model="value"
-      :disabled="disabled"
-      v-bind="{ ...field.props, ...field.attrs }"
-    />
+    <USwitch v-else-if="field.component === 'USwitch'" v-model="value" :disabled="disabled"
+      v-bind="{ ...field.props, ...field.attrs }" />
 
     <!-- tag input -->
-    <BaseTagInput
-      v-else-if="field.component === 'UTagInput'"
-      :model-value="value"
-      :placeholder="field.placeholder"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseTagInput v-else-if="field.component === 'UTagInput'" :model-value="value" :placeholder="field.placeholder"
+      :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- date range -->
-    <BaseDateRange
-      v-else-if="field.component === 'UDateRange'"
-      :model-value="value"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseDateRange v-else-if="field.component === 'UDateRange'" :model-value="value" :disabled="disabled"
+      @update:model-value="value = $event" />
 
     <!-- OTP / PIN -->
-    <BaseOtpInput
-      v-else-if="field.component === 'UOtpInput'"
-      :model-value="value"
-      :length="field.props?.length ?? 6"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseOtpInput v-else-if="field.component === 'UOtpInput'" :model-value="value" :length="field.props?.length ?? 6"
+      :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- repeater group -->
-    <BaseRepeaterGroup
-      v-else-if="field.component === 'URepeater'"
-      :fields="field.props?.fields ?? []"
-      :model-value="value"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseRepeaterGroup v-else-if="field.component === 'URepeater'" :fields="field.props?.fields ?? []"
+      :model-value="value" :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- table field -->
-    <BaseTableField
-      v-else-if="field.component === 'UTableField'"
-      :columns="field.props?.columns ?? []"
-      :model-value="value"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <BaseTableField v-else-if="field.component === 'UTableField'" :columns="field.props?.columns ?? []"
+      :model-value="value" :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- image / avatar upload -->
-    <UFileUpload
-      v-else-if="field.component === 'UFileUpload'"
-      :model-value="value"
-      v-bind="{ accept: 'image/*', ...field.props, ...field.attrs }"
-      :disabled="disabled"
-      @update:model-value="value = $event"
-    />
+    <UFileUpload v-else-if="field.component === 'UFileUpload'" :model-value="value"
+      v-bind="{ accept: 'image/*', ...field.props, ...field.attrs }" :disabled="disabled"
+      @update:model-value="value = $event" />
 
     <!-- file input -->
-    <input
-      v-else-if="field.component === 'UFileInput'"
-      type="file"
-      v-bind="{ ...field.props, ...field.attrs }"
+    <input v-else-if="field.component === 'UFileInput'" type="file" v-bind="{ ...field.props, ...field.attrs }"
       :disabled="disabled"
       class="block w-full cursor-pointer text-sm text-gray-500 file:mr-4 file:cursor-pointer file:rounded-md file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
-      @change="onFileChange"
-    />
+      @change="onFileChange" />
+
+    <!-- CamDigiKey identity -->
+    <BaseCamDigiKey v-else-if="field.component === 'UCamDigiKey'" :field="field" :model-value="value"
+      :disabled="disabled" @update:model-value="value = $event" />
 
     <!-- all other Nuxt UI components -->
-    <component
-      v-else
-      :is="getComponent(field)"
-      v-model="value"
-      :placeholder="field.placeholder"
-      :type="field.type"
-      :disabled="disabled"
-      v-bind="fieldProps()"
-      class="w-full"
-    />
+    <component v-else :is="getComponent(field)" v-model="value" :placeholder="field.placeholder" :type="field.type"
+      :disabled="disabled" v-bind="fieldProps()" class="w-full" />
   </UFormField>
 </template>

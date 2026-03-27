@@ -2,7 +2,7 @@ import type { Ref, ComputedRef } from "vue";
 import type { ValidationRule } from "~/utils/form-schema";
 import type { CanvasField, CanvasPage } from "~/pages/builder/config";
 
-//  Constants 
+//  Constants
 
 export const ruleTypeOptions = [
   { label: "Min length", value: "min" },
@@ -28,9 +28,15 @@ export const supportsRequiredMessage = [
   "UDateRange",
   "UOtpInput",
   "UMapPicker",
+  "UCamDigiKey",
 ];
 
-export const hasItems = ["USelect", "URadioGroup", "UCheckboxGroup", "USelectMenu"];
+export const hasItems = [
+  "USelect",
+  "URadioGroup",
+  "UCheckboxGroup",
+  "USelectMenu",
+];
 
 export const colTypeOptions = [
   { label: "Text", value: "text" },
@@ -52,7 +58,12 @@ export const colSpanOptions = [
   { label: "Quarter (3)", value: 3 },
 ];
 
-export const ADDRESS_LEVELS = ["province", "district", "commune", "village"] as const;
+export const ADDRESS_LEVELS = [
+  "province",
+  "district",
+  "commune",
+  "village",
+] as const;
 export const addressLevelLabels: Record<string, string> = {
   province: "Province (ខេត្ត/ក្រុង)",
   district: "District (ស្រុក/ក្រុង)",
@@ -77,7 +88,10 @@ export function useFieldEditor(params: {
       for (const sec of page.sections)
         for (const row of sec.rows) {
           const f = row.fields.find((f) => f._id === selectedId.value);
-          if (f) { Object.assign(f, patch); return; }
+          if (f) {
+            Object.assign(f, patch);
+            return;
+          }
         }
   }
 
@@ -88,7 +102,10 @@ export function useFieldEditor(params: {
         for (const sec of page.sections)
           for (const row of sec.rows)
             for (const f of row.fields)
-              if (f._id === id) { field = f; break outer; }
+              if (f._id === id) {
+                field = f;
+                break outer;
+              }
     }
     modal.openConfirm({
       title: "Remove Field",
@@ -100,22 +117,32 @@ export function useFieldEditor(params: {
           for (const sec of page.sections)
             for (const row of sec.rows) {
               const idx = row.fields.findIndex((f) => f._id === id);
-              if (idx >= 0) { row.fields.splice(idx, 1); break; }
+              if (idx >= 0) {
+                row.fields.splice(idx, 1);
+                break;
+              }
             }
-        if (selectedId.value === id) { selectedId.value = null; rightPanel.value = null; }
+        if (selectedId.value === id) {
+          selectedId.value = null;
+          rightPanel.value = null;
+        }
       },
     });
   }
 
-  //  Full Address sub-field 
+  //  Full Address sub-field
 
-  function updateFullAddressSubField(field: CanvasField, level: string, patch: Record<string, any>) {
+  function updateFullAddressSubField(
+    field: CanvasField,
+    level: string,
+    patch: Record<string, any>,
+  ) {
     const subFields = { ...(field.props?.subFields ?? {}) };
     subFields[level] = { ...(subFields[level] ?? {}), ...patch };
     updateSelected({ props: { ...field.props, subFields } });
   }
 
-  //  Validation rules 
+  //  Validation rules
 
   function addRule(field: CanvasField) {
     updateSelected({
@@ -130,7 +157,11 @@ export function useFieldEditor(params: {
     rules.splice(idx, 1);
     updateSelected({ validation: rules });
   }
-  function updateRule(field: CanvasField, idx: number, patch: Partial<ValidationRule>) {
+  function updateRule(
+    field: CanvasField,
+    idx: number,
+    patch: Partial<ValidationRule>,
+  ) {
     const rules = [...(field.validation ?? [])] as ValidationRule[];
     rules[idx] = { ...rules[idx], ...patch };
     updateSelected({ validation: rules });
@@ -140,15 +171,20 @@ export function useFieldEditor(params: {
   }
   function setAddressRequiredMessage(message: string) {
     updateSelected({
-      validation: message.trim() ? [{ type: "required" as const, message }] : [],
+      validation: message.trim()
+        ? [{ type: "required" as const, message }]
+        : [],
     });
   }
 
-  //  Select / Radio / Checkbox items 
+  //  Select / Radio / Checkbox items
 
   function addItem(field: CanvasField) {
     const items = [...(field.items ?? [])];
-    items.push({ label: `Option ${items.length + 1}`, value: `opt${items.length + 1}` });
+    items.push({
+      label: `Option ${items.length + 1}`,
+      value: `opt${items.length + 1}`,
+    });
     updateSelected({ items });
   }
   function removeItem(field: CanvasField, idx: number) {
@@ -156,7 +192,12 @@ export function useFieldEditor(params: {
     items.splice(idx, 1);
     updateSelected({ items });
   }
-  function updateItem(field: CanvasField, idx: number, key: "label" | "value", val: string) {
+  function updateItem(
+    field: CanvasField,
+    idx: number,
+    key: "label" | "value",
+    val: string,
+  ) {
     const items = [...(field.items ?? [])];
     items[idx] = { ...items[idx], [key]: val };
     updateSelected({ items });
@@ -175,7 +216,11 @@ export function useFieldEditor(params: {
     cols.splice(idx, 1);
     updateSelected({ props: { ...field.props, columns: cols } });
   }
-  function updateTableColumn(field: CanvasField, idx: number, patch: Record<string, any>) {
+  function updateTableColumn(
+    field: CanvasField,
+    idx: number,
+    patch: Record<string, any>,
+  ) {
     const cols = [...(field.props?.columns ?? [])] as any[];
     cols[idx] = { ...cols[idx], ...patch };
     updateSelected({ props: { ...field.props, columns: cols } });
@@ -183,18 +228,31 @@ export function useFieldEditor(params: {
   function addTableColOption(field: CanvasField, colIdx: number) {
     const cols = [...(field.props?.columns ?? [])] as any[];
     const opts = [...(cols[colIdx].options ?? [])];
-    opts.push({ label: `Option ${opts.length + 1}`, value: `opt${opts.length + 1}` });
+    opts.push({
+      label: `Option ${opts.length + 1}`,
+      value: `opt${opts.length + 1}`,
+    });
     cols[colIdx] = { ...cols[colIdx], options: opts };
     updateSelected({ props: { ...field.props, columns: cols } });
   }
-  function removeTableColOption(field: CanvasField, colIdx: number, optIdx: number) {
+  function removeTableColOption(
+    field: CanvasField,
+    colIdx: number,
+    optIdx: number,
+  ) {
     const cols = [...(field.props?.columns ?? [])] as any[];
     const opts = [...(cols[colIdx].options ?? [])];
     opts.splice(optIdx, 1);
     cols[colIdx] = { ...cols[colIdx], options: opts };
     updateSelected({ props: { ...field.props, columns: cols } });
   }
-  function updateTableColOption(field: CanvasField, colIdx: number, optIdx: number, key: "label" | "value", val: string) {
+  function updateTableColOption(
+    field: CanvasField,
+    colIdx: number,
+    optIdx: number,
+    key: "label" | "value",
+    val: string,
+  ) {
     const cols = [...(field.props?.columns ?? [])] as any[];
     const opts = [...(cols[colIdx].options ?? [])];
     opts[optIdx] = { ...opts[optIdx], [key]: val };
@@ -202,7 +260,7 @@ export function useFieldEditor(params: {
     updateSelected({ props: { ...field.props, columns: cols } });
   }
 
-  //  Repeater sub-fields 
+  //  Repeater sub-fields
 
   function addRepeaterField(field: CanvasField) {
     const cols = [...(field.props?.fields ?? [])];
@@ -215,7 +273,11 @@ export function useFieldEditor(params: {
     cols.splice(idx, 1);
     updateSelected({ props: { ...field.props, fields: cols } });
   }
-  function updateRepeaterField(field: CanvasField, idx: number, patch: Record<string, any>) {
+  function updateRepeaterField(
+    field: CanvasField,
+    idx: number,
+    patch: Record<string, any>,
+  ) {
     const cols = [...(field.props?.fields ?? [])] as any[];
     cols[idx] = { ...cols[idx], ...patch };
     updateSelected({ props: { ...field.props, fields: cols } });
@@ -223,18 +285,31 @@ export function useFieldEditor(params: {
   function addRepeaterFieldOption(field: CanvasField, colIdx: number) {
     const cols = [...(field.props?.fields ?? [])] as any[];
     const opts = [...(cols[colIdx].options ?? [])];
-    opts.push({ label: `Option ${opts.length + 1}`, value: `opt${opts.length + 1}` });
+    opts.push({
+      label: `Option ${opts.length + 1}`,
+      value: `opt${opts.length + 1}`,
+    });
     cols[colIdx] = { ...cols[colIdx], options: opts };
     updateSelected({ props: { ...field.props, fields: cols } });
   }
-  function removeRepeaterFieldOption(field: CanvasField, colIdx: number, optIdx: number) {
+  function removeRepeaterFieldOption(
+    field: CanvasField,
+    colIdx: number,
+    optIdx: number,
+  ) {
     const cols = [...(field.props?.fields ?? [])] as any[];
     const opts = [...(cols[colIdx].options ?? [])];
     opts.splice(optIdx, 1);
     cols[colIdx] = { ...cols[colIdx], options: opts };
     updateSelected({ props: { ...field.props, fields: cols } });
   }
-  function updateRepeaterFieldOption(field: CanvasField, colIdx: number, optIdx: number, key: "label" | "value", val: string) {
+  function updateRepeaterFieldOption(
+    field: CanvasField,
+    colIdx: number,
+    optIdx: number,
+    key: "label" | "value",
+    val: string,
+  ) {
     const cols = [...(field.props?.fields ?? [])] as any[];
     const opts = [...(cols[colIdx].options ?? [])];
     opts[optIdx] = { ...opts[optIdx], [key]: val };
@@ -246,12 +321,25 @@ export function useFieldEditor(params: {
     updateSelected,
     removeField,
     updateFullAddressSubField,
-    addRule, removeRule, updateRule,
-    getAddressRequiredMessage, setAddressRequiredMessage,
-    addItem, removeItem, updateItem,
-    addTableColumn, removeTableColumn, updateTableColumn,
-    addTableColOption, removeTableColOption, updateTableColOption,
-    addRepeaterField, removeRepeaterField, updateRepeaterField,
-    addRepeaterFieldOption, removeRepeaterFieldOption, updateRepeaterFieldOption,
+    addRule,
+    removeRule,
+    updateRule,
+    getAddressRequiredMessage,
+    setAddressRequiredMessage,
+    addItem,
+    removeItem,
+    updateItem,
+    addTableColumn,
+    removeTableColumn,
+    updateTableColumn,
+    addTableColOption,
+    removeTableColOption,
+    updateTableColOption,
+    addRepeaterField,
+    removeRepeaterField,
+    updateRepeaterField,
+    addRepeaterFieldOption,
+    removeRepeaterFieldOption,
+    updateRepeaterFieldOption,
   };
 }
